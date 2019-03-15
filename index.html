@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+    <script src="js/common/SoundManager.js"></script>
+    <script src="js/common/CustomMethods.js"></script>
+    <script src="js/common/Button.js"></script>
+    <script src="js/Player.js"></script>
+    <script src="js/Game.js"></script>
+    <script>
+
+        "use strict";
+        let stage;
+        let queue;
+        let game;
+        let percentLoaded;
+        let loading;
+        let preloaderImage;
+        let preloaderMask;
+
+        function init(){
+            stage = new createjs.Stage("gameStage");
+            queue = new createjs.LoadQueue(false);
+            createjs.Sound.alternateExtensions = ["mp3"];
+            queue.installPlugin(createjs.Sound);
+            loadFontManifest();
+        }
+
+        function loadFonts(config) {
+            console.log('load fonts');
+            const loader = new createjs.FontLoader(config, true);
+            loader.on("complete", loadPreloadImages);
+            loader.load();
+        }
+
+        function loadFontManifest() {
+            loadFonts({
+                src: ['fonts/AVENGEANCE.ttf'],
+                type: "font"
+            });
+            return false;
+        }
+
+        function loadPreloadImages() {
+            console.log('load preload images');
+            queue.on("complete", setPreloadImages);
+            queue.on("progress", ()=>{console.log('progress')});
+            queue.loadManifest([
+                {id: "preloaderImage", src:"assets/preloader.png"},
+                {id: "preloaderMask", src:"assets/preloaderMask.jpg"}
+            ]);
+        }
+
+        function setPreloadImages(e) {
+            e.remove();
+            console.log('set preload images');
+            let background = new createjs.Shape();
+            background.graphics.beginFill("black").drawRect(0,0,1920,1080);
+            background.cache(0,0,1920,1080);
+
+            preloaderImage = system.CustomMethods.makeImage('preloaderImage', false);
+            preloaderImage.x = 530;
+            preloaderImage.y = 395;
+
+            preloaderMask = system.CustomMethods.makeImage('preloaderMask', false);
+            preloaderMask.rotation = 180;
+            preloaderMask.x = preloaderImage.x + 857;
+            preloaderMask.y = preloaderImage.y + 236;
+
+            percentLoaded = system.CustomMethods.makeText("0" , "90px Avengeance" , "white", 'center', 'middle');
+            percentLoaded.x = 1920/2;
+            percentLoaded.y = 750;
+
+            stage.addChild(background, preloaderImage, preloaderMask, percentLoaded);
+            startAssetsLoading();
+        }
+
+        function startAssetsLoading() {
+            console.log('start assets loading');
+            queue.removeAllEventListeners();
+            queue.on("complete", loadComplete);
+            queue.on("progress", handleProgress);
+            queue.loadManifest([
+                {id: "background", src:"assets/background.jpg"},
+                {id: "player", src:"assets/player.png"}
+            ]);
+        }
+
+        function handleProgress(event){
+            const percent = Math.round(event.progress* 100);
+            const scalePercent = (100 - percent)/100;
+            percentLoaded.text = percent;
+            preloaderMask.scaleX = scalePercent;
+            stage.update();
+        }
+
+        function loadComplete() {
+            //return;
+            stage.removeAllChildren();
+            game = new system.Game();
+            stage.addChild(game);
+            percentLoaded = null;
+            loading = null;
+            setupStage();
+            queue.removeAllEventListeners();
+        }
+
+        function setupStage(){
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
+            createjs.Ticker.addEventListener("tick", function(e){ // e needs because animation wont change framerate without it
+                game.render(e);
+            });
+        }
+
+        document.onreadystatechange = () => {
+            if (document.readyState === 'complete') {
+                resize();
+                window.addEventListener('resize', resize);
+            }
+        };
+
+        function resize() {
+            const canvas = document.getElementById('gameStage');
+            const window_width = window.innerWidth;
+            const window_height = window.innerHeight;
+            const window_ratio = window_width / window_height;
+            const game_ratio = 1920 / 1080;
+            if (window_ratio < game_ratio){
+                canvas.style.width = window_width + 'px';
+                canvas.style.height = Math.floor(window_width / game_ratio) + 'px';
+            } else {
+                canvas.style.width = Math.floor(window_height * game_ratio) + 'px';
+                canvas.style.height = window_height + 'px';
+            }
+        }
+    </script>
+</head>
+<body onload="init();" oncontextmenu= "return false">
+
+<div class="container">
+    <canvas id="gameStage" width="1920" height="1080"></canvas>
+</div>
+</body>
+</html>
