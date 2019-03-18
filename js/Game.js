@@ -70,6 +70,13 @@ this.system = this.system || {};
         document.onkeyup = (e)=>{
             this._handleKey(e.key, false);
         };
+
+        stage.on('stagemousemove', (e)=>{
+            let point = this._player.localToGlobal(this.x, this.y);
+            let angleDeg = Math.atan2(point.y - e.stageY, point.x - e.stageX) * 180 / Math.PI;
+            angleDeg -= 90;
+            this._player.rotation = Math.round(angleDeg);
+        });
     };
 
     p._handleKey = function(key, bool) {
