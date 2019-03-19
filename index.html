@@ -9,6 +9,7 @@
     <script src="js/common/CustomMethods.js"></script>
     <script src="js/common/Button.js"></script>
     <script src="js/Player.js"></script>
+    <script src="js/Bullet.js"></script>
     <script src="js/Game.js"></script>
     <script>
 
@@ -85,7 +86,8 @@
             queue.on("progress", handleProgress);
             queue.loadManifest([
                 {id: "background", src:"assets/background.jpg"},
-                {id: "player", src:"assets/player.png"}
+                {id: "player", src:"assets/player.png"},
+                {id: "bullet", src:"assets/bullet.jpg"}
             ]);
         }
 
