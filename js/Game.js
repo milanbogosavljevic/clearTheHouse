@@ -13,6 +13,9 @@ this.system = this.system || {};
     p._player = null;
     p._playerMovement = null;
     p._playerBullets = null;
+    p._enemy = null;
+    p._enemyBullets = null;
+    p._enemyBulletsCont = null;
     p._level = null;
     p._fpsText = null;
 
@@ -33,7 +36,8 @@ this.system = this.system || {};
     p._DOWN_AREA_BORDER = null;
 
     p._init = function () {
-        this._playerBullets = [];
+        let playerBullets = this._playerBullets = [];
+        let enemyBullets = this._enemyBullets = [];
 
         this._level = new createjs.Container();
 
@@ -44,7 +48,11 @@ this.system = this.system || {};
         player.y = 500;
         this._setPlayerMovement();
 
-        this._level.addChild(back, player);
+        const enemy = this._enemy = new system.Enemy();
+        enemy.x = 300;
+        enemy.y = 500;
+
+        this._level.addChild(back, player, enemy);
         this.addChild(this._level);
 
         let fps = this._fpsText = system.CustomMethods.makeText('', '50px Arial', '#fff', 'center', 'middle');
@@ -77,27 +85,34 @@ this.system = this.system || {};
             this._handleKey(e.key, false);
         };
         stage.on('stagemousemove', (e)=>{
+            const playerDimension = this._player.getDimension();
             let point = this._player.localToGlobal(this.x, this.y);
-            let angleDeg = Math.atan2(point.y - e.stageY, point.x - e.stageX) * 180 / Math.PI;
+            console.log(e.stageX);
+            let angleDeg = Math.atan2((point.y + playerDimension.height/2) - e.stageY, (point.x + playerDimension.width/2) - e.stageX) * 180 / Math.PI;
             angleDeg -= 90;
-            this._player.rotation = Math.round(angleDeg);
+            //this._player.rotation = Math.round(angleDeg);
+            this._player.rotateGun(Math.round(angleDeg));
         });
         stage.on('click', (e)=>{
-            console.log('click');
+            const playerDimension = this._player.getDimension();
+            let bull = system.CustomMethods.makeImage('bullet', false, true);
+            bull.x = this._player.x + playerDimension.width/2;
+            bull.y = this._player.y + playerDimension.height/2;
+            this._level.addChild(bull);
         });
         // ADDING EVENT LISTENERS
 
-        this._bull = system.CustomMethods.makeImage('bullet', false, true);
-        this._bull.x = 200;
-        this._bull.y = 200;
+        let bull = system.CustomMethods.makeImage('bullet', false, true);
+        bull.x = 200;
+        bull.y = 200;
+        enemyBullets.push(bull);
+        this._level.addChild(bull);
 
-        this._player2 = system.CustomMethods.makeImage('player', false, true);
-        this._player2.x = 500;
-        this._player2.y = 500;
-        this._level.addChild(this._player2);
-
-
-        this._level.addChild(this._bull);
+        bull = system.CustomMethods.makeImage('bullet', false, true);
+        bull.x = 500;
+        bull.y = 200;
+        enemyBullets.push(bull);
+        this._level.addChild(bull);
     };
 
     p._handleKey = function(key, bool) {
@@ -155,6 +170,14 @@ this.system = this.system || {};
         }
     };
 
+    p._moveEnemy = function() {
+        const point = this._enemy.localToGlobal(this.x, this.y);
+        const playerDimension = this._player.getDimension();
+        let angleDeg = Math.atan2(point.y - this._player.y - (playerDimension.height/4), point.x - this._player.x - (playerDimension.width/4)) * 180 / Math.PI;
+        angleDeg -= 90;
+        this._enemy.rotateGun(Math.round(angleDeg));
+    };
+
     p._moveLevel = function() {
         if(this._playerMovement.right === true){
             if(this._player.x > this._LEFT_AREA_BORDER){
@@ -190,11 +213,23 @@ this.system = this.system || {};
         this._playerMovement[direction] = move;
     };
 
-    p._checkBulletsHits = function() {
-        //console.log(`bull x = ${this._bull.x}      y = ${this._bull.y}`);
-        //console.log(`player x = ${this._player.x}      y = ${this._player.y}`);
-        let point = this._bull.localToGlobal(this.x, this.y);
-        console.log(this._player.hitTest(point.x, point.y));
+    p._checkPlayerHits = function() {
+        const playerDimension = this._player.getDimension();
+        let i = this._enemyBullets.length-1;
+        for(i; i > -1; i--){
+            const bullet = this._enemyBullets[i];
+            if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
+                if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
+                    console.log('hit');
+                    this._enemyBullets.splice(i,1);
+                    this._level.removeChild(bullet);
+                }
+            }
+        }
+    };
+
+    p._checkEnemyHits = function() {
+
     };
 
     p._updateFps = function() {
@@ -204,8 +239,10 @@ this.system = this.system || {};
     p.render = function(e){
         stage.update(e);
         this._movePlayer();
+        this._moveEnemy();
         this._moveLevel();
-        this._checkBulletsHits();
+        this._checkPlayerHits();
+        this._checkEnemyHits();
         this._updateFps();
     };
 

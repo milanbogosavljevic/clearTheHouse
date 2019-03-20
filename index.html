@@ -8,6 +8,7 @@
     <script src="js/common/SoundManager.js"></script>
     <script src="js/common/CustomMethods.js"></script>
     <script src="js/common/Button.js"></script>
+    <script src="js/Enemy.js"></script>
     <script src="js/Player.js"></script>
     <script src="js/Bullet.js"></script>
     <script src="js/Game.js"></script>
@@ -86,7 +87,10 @@
             queue.on("progress", handleProgress);
             queue.loadManifest([
                 {id: "background", src:"assets/background.jpg"},
-                {id: "player", src:"assets/player.png"},
+                {id: "playerBody", src:"assets/playerBody.png"},
+                {id: "enemyBody", src:"assets/enemyBody.png"},
+                {id: "playerGun", src:"assets/playerGun.png"},
+                {id: "enemyGun", src:"assets/enemyGun.png"},
                 {id: "bullet", src:"assets/bullet.jpg"}
             ]);
         }
