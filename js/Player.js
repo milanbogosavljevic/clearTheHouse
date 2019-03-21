@@ -33,6 +33,10 @@ this.system = this.system || {};
         this._height = body.image.height;
     };
 
+    p.getBulletSpeed = function() {
+        return this._bulletSpeed;
+    };
+
     p.rotateGun = function(deg) {
         this._gun.rotation = deg;
     };

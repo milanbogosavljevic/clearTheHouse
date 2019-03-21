@@ -117,6 +117,7 @@
         function setupStage(){
             createjs.Ticker.timingMode = createjs.Ticker.RAF;
             createjs.Ticker.addEventListener("tick", function(e){ // e needs because animation wont change framerate without it
+                //console.log(e.delta);
                 game.render(e);
             });
         }

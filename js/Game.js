@@ -72,10 +72,14 @@ this.system = this.system || {};
         this._DOWN_AREA_BORDER = this._LEVEL_HEIGHT - (this._LEVEL_HEIGHT/4);
 
         const playerDimension = player.getDimension();
-        this._PLAYER_LEFT_BORDER = playerDimension.width/2;
-        this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - (playerDimension.width/2);
-        this._PLAYER_UP_BORDER = playerDimension.height/2;
-        this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - (playerDimension.height/2);
+        //this._PLAYER_LEFT_BORDER = playerDimension.width/2;
+        this._PLAYER_LEFT_BORDER = 0;
+        //this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - (playerDimension.width/2);
+        this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - playerDimension.width;
+        //this._PLAYER_UP_BORDER = playerDimension.height/2;
+        this._PLAYER_UP_BORDER = 0;
+        //this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - (playerDimension.height/2);
+        this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - playerDimension.height;
         // SETTING CONSTANTS
         // ADDING EVENT LISTENERS
         document.onkeydown = (e)=>{
@@ -87,22 +91,43 @@ this.system = this.system || {};
         stage.on('stagemousemove', (e)=>{
             const playerDimension = this._player.getDimension();
             let point = this._player.localToGlobal(this.x, this.y);
-            console.log(e.stageX);
             let angleDeg = Math.atan2((point.y + playerDimension.height/2) - e.stageY, (point.x + playerDimension.width/2) - e.stageX) * 180 / Math.PI;
             angleDeg -= 90;
-            //this._player.rotation = Math.round(angleDeg);
             this._player.rotateGun(Math.round(angleDeg));
         });
         stage.on('click', (e)=>{
             const playerDimension = this._player.getDimension();
-            let bull = system.CustomMethods.makeImage('bullet', false, true);
+            const bull = system.CustomMethods.makeImage('bullet', false, true);
             bull.x = this._player.x + playerDimension.width/2;
             bull.y = this._player.y + playerDimension.height/2;
+            const p = this._level.globalToLocal(e.stageX, e.stageY);
+
+/*            const p = this._level.globalToLocal(e.stageX, e.stageY);
+            let xDif = Math.round(Math.abs(p.x - bull.x));
+            let yDif = Math.round(Math.abs(p.y - bull.y));*/
+
+            let t = this._player._gun.rotation;
+            if(t < -90){t += 180}
+            t = Math.abs(t);
+
+            bull.xSpeedAcc = t/100;
+            bull.ySpeedAcc = (90-t)/100;
+
+            console.log(`xAcc ${bull.xSpeedAcc}     yAcc ${bull.ySpeedAcc}`);
+
+            bull.right = p.x > bull.x;
+            bull.down = p.y > bull.y;
+
             this._level.addChild(bull);
+
+            this._playerBullets.push(bull);
+/*            const p = this._level.globalToLocal(e.stageX, e.stageY);
+            createjs.Tween.get(bull).to({x:p.x,y:p.y},1000);*/
+
         });
         // ADDING EVENT LISTENERS
 
-        let bull = system.CustomMethods.makeImage('bullet', false, true);
+/*        let bull = system.CustomMethods.makeImage('bullet', false, true);
         bull.x = 200;
         bull.y = 200;
         enemyBullets.push(bull);
@@ -112,7 +137,7 @@ this.system = this.system || {};
         bull.x = 500;
         bull.y = 200;
         enemyBullets.push(bull);
-        this._level.addChild(bull);
+        this._level.addChild(bull);*/
     };
 
     p._handleKey = function(key, bool) {
@@ -166,6 +191,24 @@ this.system = this.system || {};
         if(this._playerMovement.down === true){
             if(this._player.y < this._PLAYER_DOWN_BORDER){
                 this._player.y += this._player.speed;
+            }
+        }
+    };
+
+    p._movePlayerBullets = function() {
+        const speed = this._player.getBulletSpeed();
+        let i = this._playerBullets.length-1;
+        for(i; i > -1; i--){
+            const bullet = this._playerBullets[i];
+            if(bullet.right === true){
+                bullet.x += bullet.xSpeedAcc * speed;
+            }else{
+                bullet.x -= bullet.xSpeedAcc * speed;
+            }
+            if(bullet.down === true){
+                bullet.y += bullet.ySpeedAcc * speed;
+            }else{
+                bullet.y -= bullet.ySpeedAcc * speed;
             }
         }
     };
@@ -243,6 +286,7 @@ this.system = this.system || {};
         this._moveLevel();
         this._checkPlayerHits();
         this._checkEnemyHits();
+        this._movePlayerBullets();
         this._updateFps();
     };
 
