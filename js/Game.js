@@ -97,47 +97,21 @@ this.system = this.system || {};
         });
         stage.on('click', (e)=>{
             const playerDimension = this._player.getDimension();
-            const bull = system.CustomMethods.makeImage('bullet', false, true);
-            bull.x = this._player.x + playerDimension.width/2;
-            bull.y = this._player.y + playerDimension.height/2;
-            const p = this._level.globalToLocal(e.stageX, e.stageY);
-
-/*            const p = this._level.globalToLocal(e.stageX, e.stageY);
-            let xDif = Math.round(Math.abs(p.x - bull.x));
-            let yDif = Math.round(Math.abs(p.y - bull.y));*/
-
-            let t = this._player._gun.rotation;
-            if(t < -90){t += 180}
-            t = Math.abs(t);
-
-            bull.xSpeedAcc = t/100;
-            bull.ySpeedAcc = (90-t)/100;
-
-            console.log(`xAcc ${bull.xSpeedAcc}     yAcc ${bull.ySpeedAcc}`);
-
-            bull.right = p.x > bull.x;
-            bull.down = p.y > bull.y;
+            const bull = system.CustomMethods.makeImage('bullet', false, false);
+            bull.x = this._player.x + playerDimension.width/2 - 4;
+            bull.y = this._player.y + playerDimension.height/2 - 4;
 
             this._level.addChild(bull);
 
             this._playerBullets.push(bull);
-/*            const p = this._level.globalToLocal(e.stageX, e.stageY);
-            createjs.Tween.get(bull).to({x:p.x,y:p.y},1000);*/
+
+            let p = this._player.bulletPoint.localToGlobal(this.x, this.y);
+            let xP = Math.round(Math.abs(this._level.x) + p.x);
+            let yP = Math.round(Math.abs(this._level.y) + p.y);
+
+            createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
 
         });
-        // ADDING EVENT LISTENERS
-
-/*        let bull = system.CustomMethods.makeImage('bullet', false, true);
-        bull.x = 200;
-        bull.y = 200;
-        enemyBullets.push(bull);
-        this._level.addChild(bull);
-
-        bull = system.CustomMethods.makeImage('bullet', false, true);
-        bull.x = 500;
-        bull.y = 200;
-        enemyBullets.push(bull);
-        this._level.addChild(bull);*/
     };
 
     p._handleKey = function(key, bool) {
@@ -195,23 +169,23 @@ this.system = this.system || {};
         }
     };
 
-    p._movePlayerBullets = function() {
+/*    p._movePlayerBullets = function() {
         const speed = this._player.getBulletSpeed();
         let i = this._playerBullets.length-1;
         for(i; i > -1; i--){
             const bullet = this._playerBullets[i];
             if(bullet.right === true){
-                bullet.x += bullet.xSpeedAcc * speed;
+                bullet.x += bullet.xSpeedAcc /!** speed*!/;
             }else{
-                bullet.x -= bullet.xSpeedAcc * speed;
+                bullet.x -= bullet.xSpeedAcc /!** speed*!/;
             }
             if(bullet.down === true){
-                bullet.y += bullet.ySpeedAcc * speed;
+                bullet.y += bullet.ySpeedAcc /!** speed*!/;
             }else{
-                bullet.y -= bullet.ySpeedAcc * speed;
+                bullet.y -= bullet.ySpeedAcc /!** speed*!/;
             }
         }
-    };
+    };*/
 
     p._moveEnemy = function() {
         const point = this._enemy.localToGlobal(this.x, this.y);
@@ -272,7 +246,14 @@ this.system = this.system || {};
     };
 
     p._checkEnemyHits = function() {
-
+        let i = this._playerBullets.length-1;
+        for(i; i > -1; i--){
+            const bullet = this._playerBullets[i];
+            if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
+                this._playerBullets.splice(i,1);
+                this._level.removeChild(bullet);
+            }
+        }
     };
 
     p._updateFps = function() {
@@ -286,8 +267,10 @@ this.system = this.system || {};
         this._moveLevel();
         this._checkPlayerHits();
         this._checkEnemyHits();
-        this._movePlayerBullets();
+        //this._movePlayerBullets();
         this._updateFps();
+        //console.log(this._playerBullets.length);
+        //console.log(this._level.numChildren);
     };
 
     system.Game = createjs.promote(Game,"Container");
