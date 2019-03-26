@@ -15,7 +15,7 @@ this.system = this.system || {};
     p._playerBullets = null;
     p._enemy = null;
     p._enemyBullets = null;
-    p._enemyBulletsCont = null;
+    p._enemies = null;
     p._level = null;
     p._fpsText = null;
 
@@ -39,6 +39,8 @@ this.system = this.system || {};
         let playerBullets = this._playerBullets = [];
         let enemyBullets = this._enemyBullets = [];
 
+        this._enemies = [];
+
         this._level = new createjs.Container();
 
         const back = system.CustomMethods.makeImage('background', true);
@@ -48,11 +50,18 @@ this.system = this.system || {};
         player.y = 500;
         this._setPlayerMovement();
 
-        const enemy = this._enemy = new system.Enemy();
+        const enemy = new system.Enemy();
         enemy.x = 300;
         enemy.y = 500;
 
-        this._level.addChild(back, player, enemy);
+        const enemy2 = new system.Enemy();
+        enemy2.x = 800;
+        enemy2.y = 500;
+
+        this._enemies.push(enemy);
+        this._enemies.push(enemy2);
+
+        this._level.addChild(back, player, enemy, enemy2);
         this.addChild(this._level);
 
         let fps = this._fpsText = system.CustomMethods.makeText('', '50px Arial', '#fff', 'center', 'middle');
@@ -169,25 +178,10 @@ this.system = this.system || {};
         }
     };
 
-/*    p._movePlayerBullets = function() {
-        const speed = this._player.getBulletSpeed();
-        let i = this._playerBullets.length-1;
-        for(i; i > -1; i--){
-            const bullet = this._playerBullets[i];
-            if(bullet.right === true){
-                bullet.x += bullet.xSpeedAcc /!** speed*!/;
-            }else{
-                bullet.x -= bullet.xSpeedAcc /!** speed*!/;
-            }
-            if(bullet.down === true){
-                bullet.y += bullet.ySpeedAcc /!** speed*!/;
-            }else{
-                bullet.y -= bullet.ySpeedAcc /!** speed*!/;
-            }
-        }
-    };*/
-
     p._moveEnemy = function() {
+
+        // ovde
+
         const point = this._enemy.localToGlobal(this.x, this.y);
         const playerDimension = this._player.getDimension();
         let angleDeg = Math.atan2(point.y - this._player.y - (playerDimension.height/4), point.x - this._player.x - (playerDimension.width/4)) * 180 / Math.PI;
@@ -231,13 +225,14 @@ this.system = this.system || {};
     };
 
     p._checkPlayerHits = function() {
-        const playerDimension = this._player.getDimension();
         let i = this._enemyBullets.length-1;
+        if(i < 0){return;}
+        const playerDimension = this._player.getDimension();
         for(i; i > -1; i--){
             const bullet = this._enemyBullets[i];
             if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
                 if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
-                    console.log('hit');
+                    console.log('enemy hits player');
                     this._enemyBullets.splice(i,1);
                     this._level.removeChild(bullet);
                 }
@@ -247,11 +242,28 @@ this.system = this.system || {};
 
     p._checkEnemyHits = function() {
         let i = this._playerBullets.length-1;
+        if(i < 0){return;}
         for(i; i > -1; i--){
             const bullet = this._playerBullets[i];
+
             if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
                 this._playerBullets.splice(i,1);
                 this._level.removeChild(bullet);
+            }else{
+                let e = this._enemies.length - 1;
+                for(e; e > -1; e--){
+                    const enemy = this._enemies[e];
+                    const dimension = enemy.getDimension();
+
+                    if(bullet.x > enemy.x && bullet.x < (enemy.x + dimension.width)){
+                        if(bullet.y > enemy.y && bullet.y < (enemy.y + dimension.height)){
+                            this._playerBullets.splice(i,1);
+                            this._level.removeChild(bullet);
+                            enemy.alpha = 0.5;
+                            console.log('player hits enemy');
+                        }
+                    }
+                }
             }
         }
     };
@@ -267,7 +279,6 @@ this.system = this.system || {};
         this._moveLevel();
         this._checkPlayerHits();
         this._checkEnemyHits();
-        //this._movePlayerBullets();
         this._updateFps();
         //console.log(this._playerBullets.length);
         //console.log(this._level.numChildren);
