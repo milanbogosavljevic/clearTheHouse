@@ -36,8 +36,8 @@ this.system = this.system || {};
     p._DOWN_AREA_BORDER = null;
 
     p._init = function () {
-        let playerBullets = this._playerBullets = [];
-        let enemyBullets = this._enemyBullets = [];
+        this._playerBullets = [];
+        this._enemyBullets = [];
 
         this._enemies = [];
 
@@ -50,18 +50,7 @@ this.system = this.system || {};
         player.y = 500;
         this._setPlayerMovement();
 
-        const enemy = new system.Enemy();
-        enemy.x = 300;
-        enemy.y = 500;
-
-        const enemy2 = new system.Enemy();
-        enemy2.x = 800;
-        enemy2.y = 500;
-
-        this._enemies.push(enemy);
-        this._enemies.push(enemy2);
-
-        this._level.addChild(back, player, enemy, enemy2);
+        this._level.addChild(back, player);
         this.addChild(this._level);
 
         let fps = this._fpsText = system.CustomMethods.makeText('', '50px Arial', '#fff', 'center', 'middle');
@@ -106,6 +95,12 @@ this.system = this.system || {};
         });
         stage.on('click', (e)=>{
             const playerDimension = this._player.getDimension();
+
+            let point = this._player.localToGlobal(this.x, this.y);
+            let angleDeg = Math.atan2((point.y + playerDimension.height/2) - e.stageY, (point.x + playerDimension.width/2) - e.stageX) * 180 / Math.PI;
+            angleDeg -= 90;
+            this._player.rotateGun(Math.round(angleDeg));
+
             const bull = system.CustomMethods.makeImage('bullet', false, false);
             bull.x = this._player.x + playerDimension.width/2 - 4;
             bull.y = this._player.y + playerDimension.height/2 - 4;
@@ -119,8 +114,45 @@ this.system = this.system || {};
             let yP = Math.round(Math.abs(this._level.y) + p.y);
 
             createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
-
         });
+
+/*        for(let i = 0; i < 10; i++) {
+            this._addEnemy();
+        }*/
+
+        setInterval(()=>{
+            this._enemyShoot();
+        },1000);
+    };
+
+    p._addEnemy = function() {
+        const enemy = new system.Enemy();
+        enemy.x = Math.round(Math.random() * this._LEVEL_WIDTH);
+        enemy.y = Math.round(Math.random() * this._LEVEL_HEIGHT);
+        this._level.addChild(enemy);
+        this._enemies.push(enemy);
+    };
+
+    p._enemyShoot = function() {
+        let i = this._enemies.length - 1;
+        if(i < 0){return;}
+        for(i; i > -1; i--){
+            const enemy = this._enemies[i];
+            const enemyDimension = enemy.getDimension();
+            const bull = system.CustomMethods.makeImage('bullet', false, false);
+            bull.x = enemy.x + enemyDimension.width/2 - 4;
+            bull.y = enemy.y + enemyDimension.height/2 - 4;
+
+            this._level.addChild(bull);
+
+            this._enemyBullets.push(bull);
+
+            let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
+            let xP = Math.round(Math.abs(this._level.x) + p.x);
+            let yP = Math.round(Math.abs(this._level.y) + p.y);
+
+            createjs.Tween.get(bull).to({x:xP,y:yP},enemy.getBulletSpeed());
+        }
     };
 
     p._handleKey = function(key, bool) {
@@ -179,14 +211,28 @@ this.system = this.system || {};
     };
 
     p._moveEnemy = function() {
-
-        // ovde
-
-        const point = this._enemy.localToGlobal(this.x, this.y);
-        const playerDimension = this._player.getDimension();
-        let angleDeg = Math.atan2(point.y - this._player.y - (playerDimension.height/4), point.x - this._player.x - (playerDimension.width/4)) * 180 / Math.PI;
-        angleDeg -= 90;
-        this._enemy.rotateGun(Math.round(angleDeg));
+        let i = this._enemies.length - 1;
+        if(i < 0){return;}
+        for(i; i > -1; i--){
+            const enemy = this._enemies[i];
+            const speed = enemy.getMovementSpeed();
+            if(this._player.x > enemy.x){
+                enemy.x += speed;
+            }else if(this._player.x < enemy.x){
+                enemy.x -= speed;
+            }
+            if(this._player.y > enemy.y){
+                enemy.y += speed;
+            }
+            if(this._player.y < enemy.y){
+                enemy.y -= speed;
+            }
+            const playerDimension = this._player.getDimension();
+            const enemyDimension = enemy.getDimension();
+            let angleDeg = Math.atan2((enemy.y + enemyDimension.height/2) - (this._player.y + (playerDimension.height/2)), (enemy.x + enemyDimension.width/2) - (this._player.x + (playerDimension.width/2))) * 180 / Math.PI;
+            angleDeg -= 90;
+            enemy.rotateGun(Math.round(angleDeg));
+        }
     };
 
     p._moveLevel = function() {
@@ -230,11 +276,16 @@ this.system = this.system || {};
         const playerDimension = this._player.getDimension();
         for(i; i > -1; i--){
             const bullet = this._enemyBullets[i];
-            if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
-                if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
-                    console.log('enemy hits player');
-                    this._enemyBullets.splice(i,1);
-                    this._level.removeChild(bullet);
+            if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
+                this._enemyBullets.splice(i,1);
+                this._level.removeChild(bullet);
+            }else{
+                if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
+                    if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
+                        console.log('enemy hits player');
+                        this._enemyBullets.splice(i,1);
+                        this._level.removeChild(bullet);
+                    }
                 }
             }
         }
@@ -259,7 +310,9 @@ this.system = this.system || {};
                         if(bullet.y > enemy.y && bullet.y < (enemy.y + dimension.height)){
                             this._playerBullets.splice(i,1);
                             this._level.removeChild(bullet);
-                            enemy.alpha = 0.5;
+                            const ind = this._enemies.indexOf(enemy);
+                            this._enemies.splice(ind,1);
+                            this._level.removeChild(enemy);
                             console.log('player hits enemy');
                         }
                     }
@@ -280,6 +333,7 @@ this.system = this.system || {};
         this._checkPlayerHits();
         this._checkEnemyHits();
         this._updateFps();
+        //console.log(this._enemyBullets.length);
         //console.log(this._playerBullets.length);
         //console.log(this._level.numChildren);
     };

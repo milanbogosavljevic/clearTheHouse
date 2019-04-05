@@ -10,11 +10,12 @@ this.system = this.system || {};
 
     const p = createjs.extend(Enemy,createjs.Container);
 
-    p.speed = null;
     p._width = null;
     p._height = null;
     p._gun = null;
     p._bulletSpeed = null;
+
+    p.speed = null;
     p.bulletPoint = null;
 
     p._init = function () {
@@ -37,10 +38,18 @@ this.system = this.system || {};
 
         this.addChild(gun);
 
-        this.speed = 10;
+        this.speed = 1;
         this._bulletSpeed = 3000;
         this._width = body.image.width;
         this._height = body.image.height;
+    };
+
+    p.setMovementSpeed = function(speed) {
+        this.speed = speed;
+    };
+
+    p.getMovementSpeed = function() {
+        return this.speed;
     };
 
     p.rotateGun = function(deg) {
