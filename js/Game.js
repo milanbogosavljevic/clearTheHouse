@@ -93,7 +93,13 @@ this.system = this.system || {};
         document.onkeyup = (e)=>{
             this._handleKey(e.key, false);
         };
+
+        const cursor = system.CustomMethods.makeImage('cursor', false, true);
+        this.addChild(cursor);
+
         stage.on('stagemousemove', (e)=>{
+            cursor.x = e.stageX;
+            cursor.y = e.stageY;
             const playerDimension = this._player.getDimension();
             let point = this._player.localToGlobal(this.x, this.y);
             let angleDeg = Math.atan2((point.y + playerDimension.height/2) - e.stageY, (point.x + playerDimension.width/2) - e.stageX) * 180 / Math.PI;
@@ -138,7 +144,7 @@ this.system = this.system || {};
         const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_WIDTH, (this._LEVEL_WIDTH + 100));
         const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_HEIGHT, (this._LEVEL_HEIGHT + 100));
 
-        const speed = 4;
+        const speed = 5;
         enemy.x = xSpawn;
         enemy.y = ySpawn;
         enemy.setMovementSpeed(speed);
@@ -271,8 +277,8 @@ this.system = this.system || {};
         for(i; i > -1; i--){
             const enemy = this._activeEnemies[i];
             const speed = enemy.getMovementSpeed();
-            const xDifference = Math.abs(this._player.x - enemy.x); // nema potrebe ako su svi iste brzine, ne mogu da se prestizu
-            const yDifference = Math.abs(this._player.y - enemy.y); // nema potrebe ako su svi iste brzine, ne mogu da se prestizu
+            const xDifference = Math.abs(this._player.x - enemy.x);
+            const yDifference = Math.abs(this._player.y - enemy.y);
             if(this._player.x > enemy.x){
                 if(this._checkRightLeft(i,'right') === true){
                     if(xDifference > speed){
@@ -287,14 +293,14 @@ this.system = this.system || {};
                 }
             }
             if(this._player.y > enemy.y){
-                if(this._checkUpDown(i, 'up')){
+                if(this._checkUpDown(i, 'up') === true){
                     if(yDifference > speed){
                         enemy.y += speed;
                     }
                 }
             }
             if(this._player.y < enemy.y){
-                if(this._checkUpDown(i, 'down')) {
+                if(this._checkUpDown(i, 'down') === true) {
                     if (yDifference > speed) {
                         enemy.y -= speed;
                     }
