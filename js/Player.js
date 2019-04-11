@@ -10,7 +10,7 @@ this.system = this.system || {};
 
     const p = createjs.extend(Player,createjs.Container);
 
-    p.speed = null;
+    p._speed = null;
     p._width = null;
     p._height = null;
     p._gun = null;
@@ -36,7 +36,6 @@ this.system = this.system || {};
 
         this.addChild(gun);
 
-        this.speed = 10;
         this._bulletSpeed = 3000;
         this._width = body.image.width;
         this._height = body.image.height;
@@ -55,6 +54,14 @@ this.system = this.system || {};
             width:this._width,
             height:this._height
         }
+    };
+
+    p.setMovementSpeed = function(speed) {
+        this._speed = speed;
+    };
+
+    p.getMovementSpeed = function() {
+        return this._speed;
     };
 
     system.Player = createjs.promote(Player,"Container");

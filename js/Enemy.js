@@ -38,7 +38,7 @@ this.system = this.system || {};
 
         this.addChild(gun);
 
-        this.speed = 1;
+        this.speed = 2;
         this._bulletSpeed = 3000;
         this._width = body.image.width;
         this._height = body.image.height;

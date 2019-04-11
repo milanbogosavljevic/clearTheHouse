@@ -12,10 +12,12 @@ this.system = this.system || {};
 
     p._player = null;
     p._playerMovement = null;
+    p._playerAmmo = null;
     p._playerBullets = null;
-    p._enemy = null;
-    p._enemyBullets = null;
     p._enemies = null;
+    p._enemyAmmo = null;
+    p._enemyBullets = null;
+    p._activeEnemies = null;
     p._level = null;
     p._fpsText = null;
 
@@ -36,10 +38,14 @@ this.system = this.system || {};
     p._DOWN_AREA_BORDER = null;
 
     p._init = function () {
+        this._playerAmmo = [];
         this._playerBullets = [];
+
+        this._enemyAmmo = [];
         this._enemyBullets = [];
 
         this._enemies = [];
+        this._activeEnemies = [];
 
         this._level = new createjs.Container();
 
@@ -48,6 +54,7 @@ this.system = this.system || {};
         const player = this._player = new system.Player();
         player.x = 300;
         player.y = 500;
+        player.setMovementSpeed(10);
         this._setPlayerMovement();
 
         this._level.addChild(back, player);
@@ -94,64 +101,111 @@ this.system = this.system || {};
             this._player.rotateGun(Math.round(angleDeg));
         });
         stage.on('click', (e)=>{
-            const playerDimension = this._player.getDimension();
-
-            let point = this._player.localToGlobal(this.x, this.y);
-            let angleDeg = Math.atan2((point.y + playerDimension.height/2) - e.stageY, (point.x + playerDimension.width/2) - e.stageX) * 180 / Math.PI;
-            angleDeg -= 90;
-            this._player.rotateGun(Math.round(angleDeg));
-
-            const bull = system.CustomMethods.makeImage('bullet', false, false);
-            bull.x = this._player.x + playerDimension.width/2 - 4;
-            bull.y = this._player.y + playerDimension.height/2 - 4;
-
-            this._level.addChild(bull);
-
-            this._playerBullets.push(bull);
-
-            let p = this._player.bulletPoint.localToGlobal(this.x, this.y);
-            let xP = Math.round(Math.abs(this._level.x) + p.x);
-            let yP = Math.round(Math.abs(this._level.y) + p.y);
-
-            createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
+            this._playerShoot(e.stageX, e.stageY)
         });
 
-/*        for(let i = 0; i < 10; i++) {
-            this._addEnemy();
-        }*/
-
         setInterval(()=>{
-            this._enemyShoot();
-        },1000);
+            //this._enemyShoot();
+            if(this._activeEnemies.length < 10){
+                this._addEnemy();
+            }
+        },2000);
+
+        this._addEnemies(10);
+
+/*        setTimeout(()=>{
+            player.setMovementSpeed(6);
+        },3000);*/
+    };
+
+    p._addEnemies = function(numOfEnemies) {
+        for(let i = 0; i < numOfEnemies; i++) {
+            this._addEnemy();
+        }
     };
 
     p._addEnemy = function() {
-        const enemy = new system.Enemy();
-        enemy.x = Math.round(Math.random() * this._LEVEL_WIDTH);
-        enemy.y = Math.round(Math.random() * this._LEVEL_HEIGHT);
-        this._level.addChild(enemy);
-        this._enemies.push(enemy);
+        let enemy;
+        if(this._enemies.length > 0){
+            enemy = this._enemies[0];
+            this._enemies.splice(0,1);
+            enemy.visible = true;
+        }else{
+            enemy = new system.Enemy();
+            this._level.addChild(enemy);
+        }
+
+        const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_WIDTH, (this._LEVEL_WIDTH + 100));
+        const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_HEIGHT, (this._LEVEL_HEIGHT + 100));
+
+        const speed = 4;
+        enemy.x = xSpawn;
+        enemy.y = ySpawn;
+        enemy.setMovementSpeed(speed);
+
+        this._activeEnemies.push(enemy);
+    };
+
+    p._playerShoot = function(mouseX, mouseY) {
+        const playerDimension = this._player.getDimension();
+
+        let point = this._player.localToGlobal(this.x, this.y);
+        let angleDeg = Math.atan2((point.y + playerDimension.height/2) - mouseY, (point.x + playerDimension.width/2) - mouseX) * 180 / Math.PI;
+        angleDeg -= 90;
+        this._player.rotateGun(Math.round(angleDeg));
+
+        let bull;
+
+        if(this._playerAmmo.length > 0){
+            bull = this._playerAmmo[0];
+            this._playerAmmo.splice(0,1);
+            bull.visible = true;
+        }else{
+            bull = system.CustomMethods.makeImage('bullet', false, false);
+            this._level.addChild(bull);
+        }
+
+        bull.x = this._player.x + playerDimension.width/2 - 4;
+        bull.y = this._player.y + playerDimension.height/2 - 4;
+
+        let p = this._player.bulletPoint.localToGlobal(this.x, this.y);
+        let xP = Math.round(Math.abs(this._level.x) + p.x);
+        let yP = Math.round(Math.abs(this._level.y) + p.y);
+
+        this._playerBullets.push(bull);
+
+        createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
     };
 
     p._enemyShoot = function() {
-        let i = this._enemies.length - 1;
+        let i = this._activeEnemies.length - 1;
         if(i < 0){return;}
+
+        let bullet;
+
         for(i; i > -1; i--){
-            const enemy = this._enemies[i];
+            const enemy = this._activeEnemies[i];
             const enemyDimension = enemy.getDimension();
-            const bull = system.CustomMethods.makeImage('bullet', false, false);
-            bull.x = enemy.x + enemyDimension.width/2 - 4;
-            bull.y = enemy.y + enemyDimension.height/2 - 4;
 
-            this._level.addChild(bull);
+            if(this._enemyAmmo.length > 0){
+                bullet = this._enemyAmmo[0];
+                this._enemyAmmo.splice(0,1);
+                bullet.visible = true;
+            }else {
+                bullet = system.CustomMethods.makeImage('bullet', false, false);
+                this._level.addChild(bullet);
+            }
 
-            this._enemyBullets.push(bull);
+            bullet.x = enemy.x + enemyDimension.width/2 - 4;
+            bullet.y = enemy.y + enemyDimension.height/2 - 4;
 
             let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
             let xP = Math.round(Math.abs(this._level.x) + p.x);
             let yP = Math.round(Math.abs(this._level.y) + p.y);
 
-            createjs.Tween.get(bull).to({x:xP,y:yP},enemy.getBulletSpeed());
+            this._enemyBullets.push(bullet);
+
+            createjs.Tween.get(bullet).to({x:xP,y:yP},enemy.getBulletSpeed());
         }
     };
 
@@ -188,44 +242,63 @@ this.system = this.system || {};
     };
 
     p._movePlayer = function() {
+        const movementSpeed = this._player.getMovementSpeed();
         if(this._playerMovement.left === true){
             if(this._player.x > this._PLAYER_LEFT_BORDER){
-                this._player.x -= this._player.speed;
+                this._player.x -= movementSpeed;
             }
         }
         if(this._playerMovement.right === true){
             if(this._player.x < this._PLAYER_RIGHT_BORDER) {
-                this._player.x += this._player.speed;
+                this._player.x += movementSpeed;
             }
         }
         if(this._playerMovement.up === true){
             if(this._player.y > this._PLAYER_UP_BORDER){
-                this._player.y -= this._player.speed;
+                this._player.y -= movementSpeed;
             }
         }
         if(this._playerMovement.down === true){
             if(this._player.y < this._PLAYER_DOWN_BORDER){
-                this._player.y += this._player.speed;
+                this._player.y += movementSpeed;
             }
         }
     };
 
     p._moveEnemy = function() {
-        let i = this._enemies.length - 1;
+        let i = this._activeEnemies.length - 1;
         if(i < 0){return;}
         for(i; i > -1; i--){
-            const enemy = this._enemies[i];
+            const enemy = this._activeEnemies[i];
             const speed = enemy.getMovementSpeed();
+            const xDifference = Math.abs(this._player.x - enemy.x); // nema potrebe ako su svi iste brzine, ne mogu da se prestizu
+            const yDifference = Math.abs(this._player.y - enemy.y); // nema potrebe ako su svi iste brzine, ne mogu da se prestizu
             if(this._player.x > enemy.x){
-                enemy.x += speed;
+                if(this._checkRightLeft(i,'right') === true){
+                    if(xDifference > speed){
+                        enemy.x += speed;
+                    }
+                }
             }else if(this._player.x < enemy.x){
-                enemy.x -= speed;
+                if(this._checkRightLeft(i,'left') === true) {
+                    if(xDifference > speed){
+                        enemy.x -= speed;
+                    }
+                }
             }
             if(this._player.y > enemy.y){
-                enemy.y += speed;
+                if(this._checkUpDown(i, 'up')){
+                    if(yDifference > speed){
+                        enemy.y += speed;
+                    }
+                }
             }
             if(this._player.y < enemy.y){
-                enemy.y -= speed;
+                if(this._checkUpDown(i, 'down')) {
+                    if (yDifference > speed) {
+                        enemy.y -= speed;
+                    }
+                }
             }
             const playerDimension = this._player.getDimension();
             const enemyDimension = enemy.getDimension();
@@ -235,32 +308,83 @@ this.system = this.system || {};
         }
     };
 
+    p._checkRightLeft = function(ind,direction) {
+        const mainEnemy = this._activeEnemies[ind];
+        const mX = mainEnemy.x;
+        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+        const spacing = 80;
+        let canGo = true;
+        let i = this._activeEnemies.length - 1;
+        for(i; i > -1; i--){
+            if(i !== ind){
+                const enemy = this._activeEnemies[i];
+                const eX = enemy.x;
+                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                let diff = direction === 'right' ? (eX - mX) : (mX - eX);
+                const yDiff = Math.abs(mY - eY); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                if(yDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                    if(diff < spacing && diff > 0){
+                        canGo = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return canGo;
+    };
+
+    p._checkUpDown = function(ind,direction) {
+        const mainEnemy = this._activeEnemies[ind];
+        const mX = mainEnemy.x;
+        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+        const spacing = 80;
+        let canGo = true;
+        let i = this._activeEnemies.length - 1;
+        for(i; i > -1; i--){
+            if(i !== ind){
+                const enemy = this._activeEnemies[i];
+                const eX = enemy.x;
+                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                let diff = direction === 'up' ? (eY - mY) : (mY - eY);
+                const xDiff = Math.abs(mX - eX); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                if(xDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                    if(diff < spacing && diff > 0){
+                        canGo = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return canGo;
+    };
+
     p._moveLevel = function() {
+        const movementSpeed = this._player.getMovementSpeed();
         if(this._playerMovement.right === true){
             if(this._player.x > this._LEFT_AREA_BORDER){
                 if(this._level.x > -(this._CAMERA_WIDTH)){
-                    this._level.x -= this._player.speed;
+                    this._level.x -= movementSpeed;
                 }
             }
         }
         if(this._playerMovement.left === true){
             if(this._player.x < this._RIGHT_AREA_BORDER){
                 if(this._level.x < 0) {
-                    this._level.x += this._player.speed;
+                    this._level.x += movementSpeed;
                 }
             }
         }
         if(this._playerMovement.down === true){
             if(this._player.y > this._UP_AREA_BORDER){
                 if(this._level.y > -(this._CAMERA_HEIGHT)) {
-                    this._level.y -= this._player.speed;
+                    this._level.y -= movementSpeed;
                 }
             }
         }
         if(this._playerMovement.up === true){
             if(this._player.y < this._DOWN_AREA_BORDER){
                 if(this._level.y < 0) {
-                    this._level.y += this._player.speed;
+                    this._level.y += movementSpeed;
                 }
             }
         }
@@ -277,14 +401,18 @@ this.system = this.system || {};
         for(i; i > -1; i--){
             const bullet = this._enemyBullets[i];
             if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
+                this._enemyAmmo.push(bullet);
                 this._enemyBullets.splice(i,1);
-                this._level.removeChild(bullet);
+                bullet.visible = false;
+                //this._level.removeChild(bullet);
             }else{
                 if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
                     if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
-                        console.log('enemy hits player');
+                        this._enemyAmmo.push(bullet);
                         this._enemyBullets.splice(i,1);
-                        this._level.removeChild(bullet);
+                        bullet.visible = false;
+                        //this._level.removeChild(bullet);
+                        console.log('enemy hits player');
                     }
                 }
             }
@@ -298,21 +426,24 @@ this.system = this.system || {};
             const bullet = this._playerBullets[i];
 
             if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
+                this._playerAmmo.push(bullet);
                 this._playerBullets.splice(i,1);
-                this._level.removeChild(bullet);
+                bullet.visible = false;
             }else{
-                let e = this._enemies.length - 1;
+                let e = this._activeEnemies.length - 1;
                 for(e; e > -1; e--){
-                    const enemy = this._enemies[e];
+                    const enemy = this._activeEnemies[e];
                     const dimension = enemy.getDimension();
 
                     if(bullet.x > enemy.x && bullet.x < (enemy.x + dimension.width)){
                         if(bullet.y > enemy.y && bullet.y < (enemy.y + dimension.height)){
+                            this._playerAmmo.push(bullet);
                             this._playerBullets.splice(i,1);
-                            this._level.removeChild(bullet);
-                            const ind = this._enemies.indexOf(enemy);
-                            this._enemies.splice(ind,1);
-                            this._level.removeChild(enemy);
+                            bullet.visible = false;
+                            enemy.visible = false;
+                            const ind = this._activeEnemies.indexOf(enemy);
+                            this._activeEnemies.splice(ind,1);
+                            this._enemies.push(enemy);
                             console.log('player hits enemy');
                         }
                     }
@@ -335,7 +466,9 @@ this.system = this.system || {};
         this._updateFps();
         //console.log(this._enemyBullets.length);
         //console.log(this._playerBullets.length);
+        //console.log(this._playerAmmo.length);
         //console.log(this._level.numChildren);
+        //console.log(this._enemies.length);
     };
 
     system.Game = createjs.promote(Game,"Container");
