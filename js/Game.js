@@ -14,10 +14,15 @@ this.system = this.system || {};
     p._playerMovement = null;
     p._playerAmmo = null;
     p._playerBullets = null;
+
     p._enemies = null;
     p._enemyAmmo = null;
     p._enemyBullets = null;
     p._activeEnemies = null;
+    p._maxNumberOfActiveEnemies = null;
+    p._maxNumberOfEnemies = null;
+    p._enemiesCounter = null;
+
     p._level = null;
     p._fpsText = null;
 
@@ -46,6 +51,8 @@ this.system = this.system || {};
 
         this._enemies = [];
         this._activeEnemies = [];
+        this._setMaxNumberOfActiveEnemies(5);
+        this._setMaxNumberOfEnemies(10);
 
         this._level = new createjs.Container();
 
@@ -77,13 +84,9 @@ this.system = this.system || {};
         this._DOWN_AREA_BORDER = this._LEVEL_HEIGHT - (this._LEVEL_HEIGHT/4);
 
         const playerDimension = player.getDimension();
-        //this._PLAYER_LEFT_BORDER = playerDimension.width/2;
         this._PLAYER_LEFT_BORDER = 0;
-        //this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - (playerDimension.width/2);
         this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - playerDimension.width;
-        //this._PLAYER_UP_BORDER = playerDimension.height/2;
         this._PLAYER_UP_BORDER = 0;
-        //this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - (playerDimension.height/2);
         this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - playerDimension.height;
         // SETTING CONSTANTS
         // ADDING EVENT LISTENERS
@@ -109,19 +112,33 @@ this.system = this.system || {};
         stage.on('click', (e)=>{
             this._playerShoot(e.stageX, e.stageY)
         });
-
+        // ADDING EVENT LISTENERS
         setInterval(()=>{
-            //this._enemyShoot();
-            if(this._activeEnemies.length < 10){
-                this._addEnemy();
-            }
-        },2000);
+            this._enemyShoot();
+            //this._manageEnemies();
+        },1000);
 
-        this._addEnemies(10);
+        //this._addEnemies(5);
 
 /*        setTimeout(()=>{
             player.setMovementSpeed(6);
         },3000);*/
+    };
+
+    p._manageEnemies = function() {
+        if(this._enemiesCounter < this._maxNumberOfEnemies){
+            if(this._activeEnemies.length < this._maxNumberOfActiveEnemies){
+                this._addEnemy();
+            }
+        }
+    };
+
+    p._setMaxNumberOfEnemies = function(num) {
+        this._maxNumberOfEnemies = num;
+    };
+
+    p._setMaxNumberOfActiveEnemies = function(num) {
+        this._maxNumberOfActiveEnemies = num;
     };
 
     p._addEnemies = function(numOfEnemies) {
@@ -131,6 +148,7 @@ this.system = this.system || {};
     };
 
     p._addEnemy = function() {
+        this._enemiesCounter++;
         let enemy;
         if(this._enemies.length > 0){
             enemy = this._enemies[0];
@@ -144,10 +162,13 @@ this.system = this.system || {};
         const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_WIDTH, (this._LEVEL_WIDTH + 100));
         const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_HEIGHT, (this._LEVEL_HEIGHT + 100));
 
-        const speed = 5;
+        const speed = 2;
         enemy.x = xSpawn;
         enemy.y = ySpawn;
         enemy.setMovementSpeed(speed);
+
+        const shootingCooldown = system.CustomMethods.getRandomNumberFromTo(50, 500);
+        enemy.setShootinCooldown(shootingCooldown);
 
         this._activeEnemies.push(enemy);
     };
@@ -192,26 +213,27 @@ this.system = this.system || {};
         for(i; i > -1; i--){
             const enemy = this._activeEnemies[i];
             const enemyDimension = enemy.getDimension();
+            if(enemy.canShoot() === true){
+                if(this._enemyAmmo.length > 0){
+                    bullet = this._enemyAmmo[0];
+                    this._enemyAmmo.splice(0,1);
+                    bullet.visible = true;
+                }else {
+                    bullet = system.CustomMethods.makeImage('bullet', false, false);
+                    this._level.addChild(bullet);
+                }
 
-            if(this._enemyAmmo.length > 0){
-                bullet = this._enemyAmmo[0];
-                this._enemyAmmo.splice(0,1);
-                bullet.visible = true;
-            }else {
-                bullet = system.CustomMethods.makeImage('bullet', false, false);
-                this._level.addChild(bullet);
+                bullet.x = enemy.x + enemyDimension.width/2 - 4;
+                bullet.y = enemy.y + enemyDimension.height/2 - 4;
+
+                let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
+                let xP = Math.round(Math.abs(this._level.x) + p.x);
+                let yP = Math.round(Math.abs(this._level.y) + p.y);
+
+                this._enemyBullets.push(bullet);
+
+                createjs.Tween.get(bullet).to({x:xP,y:yP},enemy.getBulletSpeed());
             }
-
-            bullet.x = enemy.x + enemyDimension.width/2 - 4;
-            bullet.y = enemy.y + enemyDimension.height/2 - 4;
-
-            let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
-            let xP = Math.round(Math.abs(this._level.x) + p.x);
-            let yP = Math.round(Math.abs(this._level.y) + p.y);
-
-            this._enemyBullets.push(bullet);
-
-            createjs.Tween.get(bullet).to({x:xP,y:yP},enemy.getBulletSpeed());
         }
     };
 
@@ -311,6 +333,7 @@ this.system = this.system || {};
             let angleDeg = Math.atan2((enemy.y + enemyDimension.height/2) - (this._player.y + (playerDimension.height/2)), (enemy.x + enemyDimension.width/2) - (this._player.x + (playerDimension.width/2))) * 180 / Math.PI;
             angleDeg -= 90;
             enemy.rotateGun(Math.round(angleDeg));
+            enemy.incrementShootingCooldown();
         }
     };
 
@@ -407,15 +430,15 @@ this.system = this.system || {};
         for(i; i > -1; i--){
             const bullet = this._enemyBullets[i];
             if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
-                this._enemyAmmo.push(bullet);
                 this._enemyBullets.splice(i,1);
+                this._enemyAmmo.push(bullet);
                 bullet.visible = false;
                 //this._level.removeChild(bullet);
             }else{
                 if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
                     if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
-                        this._enemyAmmo.push(bullet);
                         this._enemyBullets.splice(i,1);
+                        this._enemyAmmo.push(bullet);
                         bullet.visible = false;
                         //this._level.removeChild(bullet);
                         console.log('enemy hits player');

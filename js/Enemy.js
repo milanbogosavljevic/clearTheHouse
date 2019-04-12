@@ -14,6 +14,8 @@ this.system = this.system || {};
     p._height = null;
     p._gun = null;
     p._bulletSpeed = null;
+    p._shootingCooldown = null;
+    p._shootingCooldownCounter = null;
 
     p.speed = null;
     p.bulletPoint = null;
@@ -31,17 +33,36 @@ this.system = this.system || {};
 
         const bulletPoint = this.bulletPoint = system.CustomMethods.makeImage('bullet', false, false);
         bulletPoint.x = 4;
-        bulletPoint.y = -4000;
+        bulletPoint.y = -4100;// mora da bude veci broj posto je spawn u razmaku od -100 do 0
         bulletPoint.visible = false;
 
         gun.addChild(gunImg,bulletPoint);
 
         this.addChild(gun);
 
-        this.speed = 2;
         this._bulletSpeed = 3000;
         this._width = body.image.width;
         this._height = body.image.height;
+
+        this._shootingCooldownCounter = 0;
+    };
+
+    p.incrementShootingCooldown = function() {
+        this._shootingCooldownCounter++;
+    };
+
+    p.setShootinCooldown = function(cooldown) {
+        console.log(cooldown);
+        this._shootingCooldown = cooldown;
+    };
+    
+    p.canShoot = function() {
+        let canShoot = false;
+        if(this._shootingCooldownCounter > this._shootingCooldown){
+            canShoot = true;
+            this._shootingCooldownCounter = 0;
+        }
+        return canShoot;
     };
 
     p.setMovementSpeed = function(speed) {
