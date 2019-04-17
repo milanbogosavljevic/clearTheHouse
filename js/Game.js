@@ -54,10 +54,8 @@ this.system = this.system || {};
 
         this._enemies = [];
         this._activeEnemies = [];
-        this._enemiesDamage = 10;
 
-        this._setMaxNumberOfActiveEnemies(5);
-        this._setMaxNumberOfEnemies(10);
+        this._setLeveParameters();
 
         this._level = new createjs.Container();
 
@@ -102,14 +100,7 @@ this.system = this.system || {};
             this._handleKey(e.key, false);
         };
 
-        const fsButtonImage = system.CustomMethods.makeImage('fsButton', true, false);
-        let fsButton = new system.Button(fsButtonImage);
-        fsButton.addEventListener('click', (e)=>{
-            system.CustomMethods.toggleFullScreen();
-        });
-        fsButton.x = 1895;
-        fsButton.y = 25;
-        this.addChild(fsButton);
+        this._addButtons();
 
         const cursor = system.CustomMethods.makeImage('cursor', false, true);
         this.addChild(cursor);
@@ -123,7 +114,7 @@ this.system = this.system || {};
             angleDeg -= 90;
             this._player.rotateGun(Math.round(angleDeg));
         });
-        back.on('mousedown', (e)=>{ // click je pravio problem kada se uradi drag, nekad ne registruje event
+        back.on('mousedown', (e)=>{ // click je pravio problem kada se uradi drag, nekad ne registruje event, stavljeno na back umesto na stage zbog dugmica
             if(this._gameOver === false){
                 if(this._player.canShoot() === true){
                     this._playerShoot(e.stageX, e.stageY);
@@ -145,12 +136,29 @@ this.system = this.system || {};
         },3000);*/
     };
 
+    p._setLeveParameters = function() { // todo hardkodovano za sad, parametri treba da zavise od trenutnog nivoa
+        this._enemiesDamage = 10;
+        this._setMaxNumberOfActiveEnemies(5);
+        this._setMaxNumberOfEnemies(10);
+    };
+
     p._manageEnemies = function() {
         if(this._enemiesCounter < this._maxNumberOfEnemies){
             if(this._activeEnemies.length < this._maxNumberOfActiveEnemies){
                 this._addEnemy();
             }
         }
+    };
+
+    p._addButtons = function() {
+        const fsButtonImage = system.CustomMethods.makeImage('fsButton', true, false);
+        let fsButton = new system.Button(fsButtonImage);
+        fsButton.addEventListener('click', (e)=>{
+            system.CustomMethods.toggleFullScreen();
+        });
+        fsButton.x = 1895;
+        fsButton.y = 25;
+        this.addChild(fsButton);
     };
 
     p._setMaxNumberOfEnemies = function(num) {
