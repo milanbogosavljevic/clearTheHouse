@@ -89,9 +89,11 @@
                 {id: "playerBody", src:"assets/playerBody.png"},
                 {id: "enemyBody", src:"assets/enemyBody.png"},
                 {id: "playerGun", src:"assets/playerGun.png"},
+                {id: "playerGunOverlay", src:"assets/playerGunOverlay.png"},
                 {id: "enemyGun", src:"assets/enemyGun.png"},
                 {id: "bullet", src:"assets/bullet.jpg"},
-                {id: "cursor", src:"assets/cursor.png"}
+                {id: "cursor", src:"assets/cursor.png"},
+                {id: "fsButton", src:"assets/fsButton.jpg"}
             ]);
         }
 
@@ -108,6 +110,7 @@
             stage.removeAllChildren();
             game = new system.Game();
             stage.addChild(game);
+            //stage.autoClear = false;
             percentLoaded = null;
             loading = null;
             setupStage();

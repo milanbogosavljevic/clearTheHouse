@@ -16,6 +16,7 @@ this.system = this.system || {};
     p._playerBullets = null;
 
     p._enemies = null;
+    p._enemiesDamage = null;
     p._enemyAmmo = null;
     p._enemyBullets = null;
     p._activeEnemies = null;
@@ -25,6 +26,8 @@ this.system = this.system || {};
 
     p._level = null;
     p._fpsText = null;
+
+    p._gameOver = false;
 
     p._CAMERA_WIDTH = null;
     p._CAMERA_HEIGHT = null;
@@ -51,6 +54,8 @@ this.system = this.system || {};
 
         this._enemies = [];
         this._activeEnemies = [];
+        this._enemiesDamage = 10;
+
         this._setMaxNumberOfActiveEnemies(5);
         this._setMaxNumberOfEnemies(10);
 
@@ -59,8 +64,8 @@ this.system = this.system || {};
         const back = system.CustomMethods.makeImage('background', true);
 
         const player = this._player = new system.Player();
-        player.x = 300;
-        player.y = 500;
+        player.x = 960;
+        player.y = 540;
         player.setMovementSpeed(10);
         this._setPlayerMovement();
 
@@ -97,6 +102,15 @@ this.system = this.system || {};
             this._handleKey(e.key, false);
         };
 
+        const fsButtonImage = system.CustomMethods.makeImage('fsButton', true, false);
+        let fsButton = new system.Button(fsButtonImage);
+        fsButton.addEventListener('click', (e)=>{
+            system.CustomMethods.toggleFullScreen();
+        });
+        fsButton.x = 1895;
+        fsButton.y = 25;
+        this.addChild(fsButton);
+
         const cursor = system.CustomMethods.makeImage('cursor', false, true);
         this.addChild(cursor);
 
@@ -109,16 +123,22 @@ this.system = this.system || {};
             angleDeg -= 90;
             this._player.rotateGun(Math.round(angleDeg));
         });
-        stage.on('click', (e)=>{
-            this._playerShoot(e.stageX, e.stageY)
+        back.on('mousedown', (e)=>{ // click je pravio problem kada se uradi drag, nekad ne registruje event
+            if(this._gameOver === false){
+                if(this._player.canShoot() === true){
+                    this._playerShoot(e.stageX, e.stageY);
+                }
+            }
         });
         // ADDING EVENT LISTENERS
-        setInterval(()=>{
-            this._enemyShoot();
-            //this._manageEnemies();
-        },1000);
+/*        setInterval(()=>{
+            if(this._gameOver === false) {
+                this._enemyShoot();
+                this._manageEnemies();
+            }
+        },1000);*/
 
-        //this._addEnemies(5);
+        this._addEnemies(5);
 
 /*        setTimeout(()=>{
             player.setMovementSpeed(6);
@@ -186,14 +206,15 @@ this.system = this.system || {};
         if(this._playerAmmo.length > 0){
             bull = this._playerAmmo[0];
             this._playerAmmo.splice(0,1);
-            bull.visible = true;
+            //bull.visible = true;
         }else{
             bull = system.CustomMethods.makeImage('bullet', false, false);
+            bull.visible = false;
             this._level.addChild(bull);
         }
 
-        bull.x = this._player.x + playerDimension.width/2 - 4;
-        bull.y = this._player.y + playerDimension.height/2 - 4;
+        bull.x = this._player.x + playerDimension.width/2 - 4; // bullet w = 8
+        bull.y = this._player.y + playerDimension.height/2 - 4; // bullet h = 8
 
         let p = this._player.bulletPoint.localToGlobal(this.x, this.y);
         let xP = Math.round(Math.abs(this._level.x) + p.x);
@@ -201,7 +222,59 @@ this.system = this.system || {};
 
         this._playerBullets.push(bull);
 
-        createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
+        // DA BI DELOVALO KAO DA JE METAK ISPOD SETUJE VISIBILITY NA TRUE POSLE PAR MILISEKUNDI
+        let startTime = 0;
+        let checkTime = true;
+        //bull.visible = false;
+        let mousePoint = this._level.globalToLocal(mouseX,mouseY);
+        let timeToShowBullet = 10;
+        if(this._playerMovement.left === true){
+            if(mousePoint.x < this._player.x){
+                timeToShowBullet = 30;
+            }else{
+                timeToShowBullet = 5;
+            }
+        }
+        if(this._playerMovement.right === true){
+            if(mousePoint.x < this._player.x){
+                timeToShowBullet = 5
+            }else{
+                timeToShowBullet = 30;
+            }
+        }
+        if(this._playerMovement.down === true){
+            if(mousePoint.y < this._player.y){
+                timeToShowBullet = 5;
+            }else{
+                timeToShowBullet = 30;
+            }
+        }
+        if(this._playerMovement.up === true){
+            if(mousePoint.y < this._player.y){
+                timeToShowBullet = 30;
+            }else{
+                timeToShowBullet = 5;
+            }
+        }
+
+        //createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
+        let bulletTween = createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
+
+        this._player.doShootAnimation();
+
+        bulletTween.addEventListener('change', (e)=>{
+            if(checkTime === true){
+                if(startTime === 0){
+                    startTime = e.timeStamp;
+                }else{
+                    if((e.timeStamp - startTime) > timeToShowBullet){
+                        bull.visible = true;
+                        checkTime = false;
+                        bulletTween.removeAllEventListeners();
+                    }
+                }
+            }
+        });
     };
 
     p._enemyShoot = function() {
@@ -433,15 +506,20 @@ this.system = this.system || {};
                 this._enemyBullets.splice(i,1);
                 this._enemyAmmo.push(bullet);
                 bullet.visible = false;
-                //this._level.removeChild(bullet);
             }else{
                 if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
                     if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
                         this._enemyBullets.splice(i,1);
                         this._enemyAmmo.push(bullet);
                         bullet.visible = false;
-                        //this._level.removeChild(bullet);
                         console.log('enemy hits player');
+                        this._player.decreaseHealth(this._enemiesDamage);
+                        this._shakeStage();
+                        if(this._player.getHealth() < 1) {
+                            this._player.visible = false;
+                            this._gameOver = true;
+                            console.log('game over');
+                        }
                     }
                 }
             }
@@ -469,10 +547,14 @@ this.system = this.system || {};
                             this._playerAmmo.push(bullet);
                             this._playerBullets.splice(i,1);
                             bullet.visible = false;
-                            enemy.visible = false;
-                            const ind = this._activeEnemies.indexOf(enemy);
-                            this._activeEnemies.splice(ind,1);
-                            this._enemies.push(enemy);
+                            enemy.decreaseHealth(this._player.getDamage());
+                            if(enemy.getHealth() < 1){
+                                enemy.visible = false;
+                                enemy.reset();
+                                const ind = this._activeEnemies.indexOf(enemy);
+                                this._activeEnemies.splice(ind,1);
+                                this._enemies.push(enemy);
+                            }
                             console.log('player hits enemy');
                         }
                     }
@@ -481,18 +563,24 @@ this.system = this.system || {};
         }
     };
 
+    p._shakeStage = function() {
+        createjs.Tween.get(this).to({x:5,y:-5},50).to({x:-5,y:5},50).to({x:5,y:-5},50).to({x:-5,y:5},50).to({x:0,y:0},50);
+    };
+
     p._updateFps = function() {
         this._fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS());
     };
 
     p.render = function(e){
-        stage.update(e);
-        this._movePlayer();
-        this._moveEnemy();
-        this._moveLevel();
-        this._checkPlayerHits();
-        this._checkEnemyHits();
+        if(this._gameOver === false){
+            this._movePlayer();
+            this._moveEnemy();
+            this._moveLevel();
+            this._checkPlayerHits();
+            this._checkEnemyHits();
+        }
         this._updateFps();
+        stage.update(e);
         //console.log(this._enemyBullets.length);
         //console.log(this._playerBullets.length);
         //console.log(this._playerAmmo.length);

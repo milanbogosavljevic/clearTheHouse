@@ -104,6 +104,11 @@ this.system = this.system || {};
         return Math.floor(Math.random() * (to - from + 1) + from);
     };
 
+    CustomMethods.getPercentage = function(fullValue, partValue) {
+        const onePercent = fullValue/100;
+        return Math.round(partValue/onePercent);
+    };
+
     CustomMethods.getRandomBool = function () {
         return Math.random() > 0.5;
     };
@@ -130,6 +135,7 @@ this.system = this.system || {};
     };
 
     CustomMethods.toggleFullScreen = function() {
+        console.log('toggle');
         if(!document.fullscreenElement){
             document.documentElement.requestFullscreen();
         }else{
