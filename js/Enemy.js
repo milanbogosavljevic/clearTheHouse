@@ -67,6 +67,14 @@ this.system = this.system || {};
         this.mouseChildren = false;
     };
 
+    p.updateColor = function(color) {
+        //this._healthShape.uncache();
+        if(this._healthColor !== color){
+            this._healthShape.color = this._healthColor;
+            this._healthShape.updateCache();
+        }
+    };
+
     p.reset = function() {
         this._health = this._startHealth;
         this._updateHealthBar(0,0,this._healthShape.originalWidth,this._healthShape.originalHeight)

@@ -14,17 +14,20 @@ this.system = this.system || {};
     p._playerMovement = null;
     p._playerAmmo = null;
     p._playerBullets = null;
+    
+    p._enemiesController = null;
 
-    p._enemies = null;
-    p._enemiesDamage = null;
-    p._enemyAmmo = null;
-    p._enemyBullets = null;
-    p._activeEnemies = null;
-    p._maxNumberOfActiveEnemies = null;
-    p._maxNumberOfEnemies = null;
-    p._enemiesCounter = null;
+    //p._enemies = null;
+    //p._enemiesDamage = null;
+    //p._enemyAmmo = null;
+    //p._enemyBullets = null;
+    //p._activeEnemies = null;
+    //p._maxNumberOfActiveEnemies = null;
+    //p._maxNumberOfEnemies = null;
+    //p._enemiesCounter = null;
 
     p._level = null;
+    p._currentLevel = null;
     p._fpsText = null;
 
     p._gameOver = false;
@@ -46,16 +49,20 @@ this.system = this.system || {};
     p._DOWN_AREA_BORDER = null;
 
     p._init = function () {
+        this._enemiesController = new system.EnemiesController(this);
+        
         this._playerAmmo = [];
         this._playerBullets = [];
 
-        this._enemyAmmo = [];
-        this._enemyBullets = [];
+        //this._enemyAmmo = [];
+        //this._enemyBullets = [];
 
-        this._enemies = [];
-        this._activeEnemies = [];
+        //this._enemies = [];
+        //this._activeEnemies = [];
 
-        this._setLeveParameters();
+        this._currentLevel = 1;
+
+        this._setLevelParameters();
 
         this._level = new createjs.Container();
 
@@ -122,33 +129,43 @@ this.system = this.system || {};
             }
         });
         // ADDING EVENT LISTENERS
-/*        setInterval(()=>{
+        setInterval(()=>{
             if(this._gameOver === false) {
-                this._enemyShoot();
-                this._manageEnemies();
+                //this._enemyShoot();
+                //this._manageEnemies();
+                this._enemiesController.manageEnemies();
             }
-        },1000);*/
+        },1000);
 
-        this._addEnemies(5);
+        //this._addEnemies(3);
+        this._enemiesController.addEnemies(3);
 
 /*        setTimeout(()=>{
             player.setMovementSpeed(6);
         },3000);*/
     };
 
-    p._setLeveParameters = function() { // todo hardkodovano za sad, parametri treba da zavise od trenutnog nivoa
-        this._enemiesDamage = 10;
-        this._setMaxNumberOfActiveEnemies(5);
-        this._setMaxNumberOfEnemies(10);
+    p._setLevelParameters = function() {
+        console.log(`setting parameters for level ${this._currentLevel}`);
+        const parameters = system.LevelParameters.getParametersForLevel(this._currentLevel);
+        this._enemiesController.setEnemiesParameters(parameters);
+/*        this._enemiesDamage = parameters.enemiesDamage;
+        this._setMaxNumberOfActiveEnemies(parameters.maxNumberOfActiveEnemies);
+        this._setMaxNumberOfEnemies(parameters.maxNumberOfEnemies);*/
     };
 
-    p._manageEnemies = function() {
+/*    p._manageEnemies = function() {
         if(this._enemiesCounter < this._maxNumberOfEnemies){
             if(this._activeEnemies.length < this._maxNumberOfActiveEnemies){
                 this._addEnemy();
             }
+        }else{
+            if(this._activeEnemies.length === 0){
+                console.log('no more enemies');
+                this._levelPassed();
+            }
         }
-    };
+    };*/
 
     p._addButtons = function() {
         const fsButtonImage = system.CustomMethods.makeImage('fsButton', true, false);
@@ -161,45 +178,19 @@ this.system = this.system || {};
         this.addChild(fsButton);
     };
 
-    p._setMaxNumberOfEnemies = function(num) {
+/*    p._setMaxNumberOfEnemies = function(num) {
         this._maxNumberOfEnemies = num;
     };
 
     p._setMaxNumberOfActiveEnemies = function(num) {
         this._maxNumberOfActiveEnemies = num;
-    };
+    };*/
 
-    p._addEnemies = function(numOfEnemies) {
+/*    p._addEnemies = function(numOfEnemies) {
         for(let i = 0; i < numOfEnemies; i++) {
             this._addEnemy();
         }
-    };
-
-    p._addEnemy = function() {
-        this._enemiesCounter++;
-        let enemy;
-        if(this._enemies.length > 0){
-            enemy = this._enemies[0];
-            this._enemies.splice(0,1);
-            enemy.visible = true;
-        }else{
-            enemy = new system.Enemy();
-            this._level.addChild(enemy);
-        }
-
-        const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_WIDTH, (this._LEVEL_WIDTH + 100));
-        const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_HEIGHT, (this._LEVEL_HEIGHT + 100));
-
-        const speed = 2;
-        enemy.x = xSpawn;
-        enemy.y = ySpawn;
-        enemy.setMovementSpeed(speed);
-
-        const shootingCooldown = system.CustomMethods.getRandomNumberFromTo(50, 500);
-        enemy.setShootinCooldown(shootingCooldown);
-
-        this._activeEnemies.push(enemy);
-    };
+    };*/
 
     p._playerShoot = function(mouseX, mouseY) {
         const playerDimension = this._player.getDimension();
@@ -286,36 +277,7 @@ this.system = this.system || {};
     };
 
     p._enemyShoot = function() {
-        let i = this._activeEnemies.length - 1;
-        if(i < 0){return;}
-
-        let bullet;
-
-        for(i; i > -1; i--){
-            const enemy = this._activeEnemies[i];
-            const enemyDimension = enemy.getDimension();
-            if(enemy.canShoot() === true){
-                if(this._enemyAmmo.length > 0){
-                    bullet = this._enemyAmmo[0];
-                    this._enemyAmmo.splice(0,1);
-                    bullet.visible = true;
-                }else {
-                    bullet = system.CustomMethods.makeImage('bullet', false, false);
-                    this._level.addChild(bullet);
-                }
-
-                bullet.x = enemy.x + enemyDimension.width/2 - 4;
-                bullet.y = enemy.y + enemyDimension.height/2 - 4;
-
-                let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
-                let xP = Math.round(Math.abs(this._level.x) + p.x);
-                let yP = Math.round(Math.abs(this._level.y) + p.y);
-
-                this._enemyBullets.push(bullet);
-
-                createjs.Tween.get(bullet).to({x:xP,y:yP},enemy.getBulletSpeed());
-            }
-        }
+        // todo ovde zvati enemyShoot iz enemy controllera
     };
 
     p._handleKey = function(key, bool) {
@@ -520,8 +482,8 @@ this.system = this.system || {};
                         this._enemyBullets.splice(i,1);
                         this._enemyAmmo.push(bullet);
                         bullet.visible = false;
-                        console.log('enemy hits player');
-                        this._player.decreaseHealth(this._enemiesDamage);
+                        //console.log('enemy hits player');
+                        this._player.decreaseHealth(this._enemiesController.getEnemiesDamage());
                         this._shakeStage();
                         if(this._player.getHealth() < 1) {
                             this._player.visible = false;
@@ -539,33 +501,16 @@ this.system = this.system || {};
         if(i < 0){return;}
         for(i; i > -1; i--){
             const bullet = this._playerBullets[i];
-
             if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
                 this._playerAmmo.push(bullet);
                 this._playerBullets.splice(i,1);
                 bullet.visible = false;
             }else{
-                let e = this._activeEnemies.length - 1;
-                for(e; e > -1; e--){
-                    const enemy = this._activeEnemies[e];
-                    const dimension = enemy.getDimension();
-
-                    if(bullet.x > enemy.x && bullet.x < (enemy.x + dimension.width)){
-                        if(bullet.y > enemy.y && bullet.y < (enemy.y + dimension.height)){
-                            this._playerAmmo.push(bullet);
-                            this._playerBullets.splice(i,1);
-                            bullet.visible = false;
-                            enemy.decreaseHealth(this._player.getDamage());
-                            if(enemy.getHealth() < 1){
-                                enemy.visible = false;
-                                enemy.reset();
-                                const ind = this._activeEnemies.indexOf(enemy);
-                                this._activeEnemies.splice(ind,1);
-                                this._enemies.push(enemy);
-                            }
-                            console.log('player hits enemy');
-                        }
-                    }
+                const bulletDamage = this._player.getDamage();
+                if(this._enemiesController.checkHitFromPlayer(bullet, bulletDamage) === true){
+                    this._playerAmmo.push(bullet);
+                    this._playerBullets.splice(i,1);
+                    bullet.visible = false;
                 }
             }
         }
@@ -577,6 +522,24 @@ this.system = this.system || {};
 
     p._updateFps = function() {
         this._fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS());
+    };
+
+    p.addEnemyBullet = function(bullet) {
+        this._level.addChild(bullet);
+    };
+
+    p.addEnemy = function(enemy) {
+        this._level.addChild(enemy);
+    };
+
+    p.levelPassed = function() {
+        this._gameOver = true;
+        this._currentLevel++;
+        this._setLevelParameters();
+        setTimeout(()=>{
+            console.log('starting next level');
+            this._gameOver = false;
+        },3000);
     };
 
     p.render = function(e){
