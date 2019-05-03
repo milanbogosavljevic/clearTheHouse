@@ -35,8 +35,8 @@ this.system = this.system || {};
     p._CAMERA_WIDTH = null;
     p._CAMERA_HEIGHT = null;
 
-    p._LEVEL_WIDTH = null;
-    p._LEVEL_HEIGHT = null;
+    p.LEVEL_WIDTH = null;
+    p.LEVEL_HEIGHT = null;
 
     p._PLAYER_LEFT_BORDER = null;
     p._PLAYER_RIGHT_BORDER = null;
@@ -85,19 +85,19 @@ this.system = this.system || {};
         this._CAMERA_WIDTH = stage.canvas.width;
         this._CAMERA_HEIGHT = stage.canvas.height;
 
-        this._LEVEL_WIDTH = back.image.width;
-        this._LEVEL_HEIGHT = back.image.height;
+        this.LEVEL_WIDTH = back.image.width;
+        this.LEVEL_HEIGHT = back.image.height;
 
         this._LEFT_AREA_BORDER = this._CAMERA_WIDTH/2;
-        this._RIGHT_AREA_BORDER = this._LEVEL_WIDTH - (this._LEVEL_WIDTH/4);
+        this._RIGHT_AREA_BORDER = this.LEVEL_WIDTH - (this.LEVEL_WIDTH/4);
         this._UP_AREA_BORDER = this._CAMERA_HEIGHT/2;
-        this._DOWN_AREA_BORDER = this._LEVEL_HEIGHT - (this._LEVEL_HEIGHT/4);
+        this._DOWN_AREA_BORDER = this.LEVEL_HEIGHT - (this.LEVEL_HEIGHT/4);
 
         const playerDimension = player.getDimension();
         this._PLAYER_LEFT_BORDER = 0;
-        this._PLAYER_RIGHT_BORDER = this._LEVEL_WIDTH - playerDimension.width;
+        this._PLAYER_RIGHT_BORDER = this.LEVEL_WIDTH - playerDimension.width;
         this._PLAYER_UP_BORDER = 0;
-        this._PLAYER_DOWN_BORDER = this._LEVEL_HEIGHT - playerDimension.height;
+        this._PLAYER_DOWN_BORDER = this.LEVEL_HEIGHT - playerDimension.height;
         // SETTING CONSTANTS
         // ADDING EVENT LISTENERS
         document.onkeydown = (e)=>{
@@ -277,7 +277,7 @@ this.system = this.system || {};
     };
 
     p._enemyShoot = function() {
-        // todo ovde zvati enemyShoot iz enemy controllera
+        this._enemiesController.enemyShoot();
     };
 
     p._handleKey = function(key, bool) {
@@ -336,98 +336,8 @@ this.system = this.system || {};
         }
     };
 
-    p._moveEnemy = function() {
-        let i = this._activeEnemies.length - 1;
-        if(i < 0){return;}
-        for(i; i > -1; i--){
-            const enemy = this._activeEnemies[i];
-            const speed = enemy.getMovementSpeed();
-            const xDifference = Math.abs(this._player.x - enemy.x);
-            const yDifference = Math.abs(this._player.y - enemy.y);
-            if(this._player.x > enemy.x){
-                if(this._checkRightLeft(i,'right') === true){
-                    if(xDifference > speed){
-                        enemy.x += speed;
-                    }
-                }
-            }else if(this._player.x < enemy.x){
-                if(this._checkRightLeft(i,'left') === true) {
-                    if(xDifference > speed){
-                        enemy.x -= speed;
-                    }
-                }
-            }
-            if(this._player.y > enemy.y){
-                if(this._checkUpDown(i, 'up') === true){
-                    if(yDifference > speed){
-                        enemy.y += speed;
-                    }
-                }
-            }
-            if(this._player.y < enemy.y){
-                if(this._checkUpDown(i, 'down') === true) {
-                    if (yDifference > speed) {
-                        enemy.y -= speed;
-                    }
-                }
-            }
-            const playerDimension = this._player.getDimension();
-            const enemyDimension = enemy.getDimension();
-            let angleDeg = Math.atan2((enemy.y + enemyDimension.height/2) - (this._player.y + (playerDimension.height/2)), (enemy.x + enemyDimension.width/2) - (this._player.x + (playerDimension.width/2))) * 180 / Math.PI;
-            angleDeg -= 90;
-            enemy.rotateGun(Math.round(angleDeg));
-            enemy.incrementShootingCooldown();
-        }
-    };
-
-    p._checkRightLeft = function(ind,direction) {
-        const mainEnemy = this._activeEnemies[ind];
-        const mX = mainEnemy.x;
-        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-        const spacing = 80;
-        let canGo = true;
-        let i = this._activeEnemies.length - 1;
-        for(i; i > -1; i--){
-            if(i !== ind){
-                const enemy = this._activeEnemies[i];
-                const eX = enemy.x;
-                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                let diff = direction === 'right' ? (eX - mX) : (mX - eX);
-                const yDiff = Math.abs(mY - eY); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                if(yDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                    if(diff < spacing && diff > 0){
-                        canGo = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return canGo;
-    };
-
-    p._checkUpDown = function(ind,direction) {
-        const mainEnemy = this._activeEnemies[ind];
-        const mX = mainEnemy.x;
-        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-        const spacing = 80;
-        let canGo = true;
-        let i = this._activeEnemies.length - 1;
-        for(i; i > -1; i--){
-            if(i !== ind){
-                const enemy = this._activeEnemies[i];
-                const eX = enemy.x;
-                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                let diff = direction === 'up' ? (eY - mY) : (mY - eY);
-                const xDiff = Math.abs(mX - eX); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                if(xDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
-                    if(diff < spacing && diff > 0){
-                        canGo = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return canGo;
+    p._moveEnemies = function() {
+        this._enemiesController.moveActiveEnemies(this._player.x, this._player.y, this._player.getDimension());
     };
 
     p._moveLevel = function() {
@@ -466,34 +376,8 @@ this.system = this.system || {};
         this._playerMovement[direction] = move;
     };
 
-    p._checkPlayerHits = function() {
-        let i = this._enemyBullets.length-1;
-        if(i < 0){return;}
-        const playerDimension = this._player.getDimension();
-        for(i; i > -1; i--){
-            const bullet = this._enemyBullets[i];
-            if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
-                this._enemyBullets.splice(i,1);
-                this._enemyAmmo.push(bullet);
-                bullet.visible = false;
-            }else{
-                if(bullet.x > this._player.x && bullet.x < (this._player.x + playerDimension.width)){
-                    if(bullet.y > this._player.y && bullet.y < (this._player.y + playerDimension.height)){
-                        this._enemyBullets.splice(i,1);
-                        this._enemyAmmo.push(bullet);
-                        bullet.visible = false;
-                        //console.log('enemy hits player');
-                        this._player.decreaseHealth(this._enemiesController.getEnemiesDamage());
-                        this._shakeStage();
-                        if(this._player.getHealth() < 1) {
-                            this._player.visible = false;
-                            this._gameOver = true;
-                            console.log('game over');
-                        }
-                    }
-                }
-            }
-        }
+    p._checkIfEnemyHitsPlayer = function() {
+        this._enemiesController.checkActiveBullets(this._player);
     };
 
     p._checkEnemyHits = function() {
@@ -501,7 +385,7 @@ this.system = this.system || {};
         if(i < 0){return;}
         for(i; i > -1; i--){
             const bullet = this._playerBullets[i];
-            if(bullet.x > this._LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._LEVEL_HEIGHT){
+            if(bullet.x > this.LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this.LEVEL_HEIGHT){
                 this._playerAmmo.push(bullet);
                 this._playerBullets.splice(i,1);
                 bullet.visible = false;
@@ -532,6 +416,14 @@ this.system = this.system || {};
         this._level.addChild(enemy);
     };
 
+    p.moveEnemyBullet = function(bullet, bulletPoint, bulletSpeed) {
+        let p = bulletPoint.localToGlobal(this.x, this.y);
+        let xP = Math.round(Math.abs(this._level.x) + p.x);
+        let yP = Math.round(Math.abs(this._level.y) + p.y);
+
+        createjs.Tween.get(bullet).to({x:xP,y:yP},bulletSpeed);
+    };
+
     p.levelPassed = function() {
         this._gameOver = true;
         this._currentLevel++;
@@ -542,12 +434,22 @@ this.system = this.system || {};
         },3000);
     };
 
+    p.enemyHitsPlayer = function(damage) {
+        this._player.decreaseHealth(damage);
+        this._shakeStage();
+        if(this._player.getHealth() < 1) {
+            this._player.visible = false;
+            this._gameOver = true;
+            console.log('game over');
+        }
+    };
+
     p.render = function(e){
         if(this._gameOver === false){
             this._movePlayer();
-            this._moveEnemy();
+            this._moveEnemies();
             this._moveLevel();
-            this._checkPlayerHits();
+            this._checkIfEnemyHitsPlayer();
             this._checkEnemyHits();
         }
         this._updateFps();

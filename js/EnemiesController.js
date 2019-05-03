@@ -45,8 +45,8 @@ this.system = this.system || {};
 
         enemy.updateColor(this._healthColor);
 
-        const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_WIDTH, (this._LEVEL_WIDTH + 100));
-        const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._LEVEL_HEIGHT, (this._LEVEL_HEIGHT + 100));
+        const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._game.LEVEL_WIDTH, (this._game.LEVEL_WIDTH + 100));
+        const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._game.LEVEL_HEIGHT, (this._game.LEVEL_HEIGHT + 100));
 
         enemy.x = xSpawn;
         enemy.y = ySpawn;
@@ -56,6 +56,57 @@ this.system = this.system || {};
         enemy.setShootinCooldown(shootingCooldown);
 
         this._activeEnemies.push(enemy);
+        console.log('add enemy');
+    };
+
+    p._checkRightLeft = function(ind,direction) {
+        const mainEnemy = this._activeEnemies[ind];
+        const mX = mainEnemy.x;
+        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+        const spacing = 80;
+        let canGo = true;
+        let i = this._activeEnemies.length - 1;
+        for(i; i > -1; i--){
+            if(i !== ind){
+                const enemy = this._activeEnemies[i];
+                const eX = enemy.x;
+                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                let diff = direction === 'right' ? (eX - mX) : (mX - eX);
+                const yDiff = Math.abs(mY - eY); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                if(yDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                    if(diff < spacing && diff > 0){
+                        canGo = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return canGo;
+    };
+
+    p._checkUpDown = function(ind,direction) {
+        const mainEnemy = this._activeEnemies[ind];
+        const mX = mainEnemy.x;
+        const mY = mainEnemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+        const spacing = 80;
+        let canGo = true;
+        let i = this._activeEnemies.length - 1;
+        for(i; i > -1; i--){
+            if(i !== ind){
+                const enemy = this._activeEnemies[i];
+                const eX = enemy.x;
+                const eY = enemy.y; // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                let diff = direction === 'up' ? (eY - mY) : (mY - eY);
+                const xDiff = Math.abs(mX - eX); // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                if(xDiff < spacing){ // da bi mogao da ga obidje, nema potrebe ako su svi iste brzine
+                    if(diff < spacing && diff > 0){
+                        canGo = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return canGo;
     };
 
     p.setEnemiesParameters = function(parameters) {
@@ -106,13 +157,14 @@ this.system = this.system || {};
                         this._enemies.push(enemy);
                     }
                     console.log('player hits enemy');
+                    return true;
                 }
             }
         }
+        return false;
     };
 
     p.enemyShoot = function() {
-        // todo ovde srediti, prebaceno iz game, mozda samo pozvati addEnemyBullet
         let i = this._activeEnemies.length - 1;
         if(i < 0){return;}
 
@@ -128,20 +180,82 @@ this.system = this.system || {};
                     bullet.visible = true;
                 }else {
                     bullet = system.CustomMethods.makeImage('bullet', false, false);
-                    this._level.addChild(bullet);
+                    this._game.addEnemyBullet(bullet);
+                    //this._level.addChild(bullet);
                 }
 
                 bullet.x = enemy.x + enemyDimension.width/2 - 4;
                 bullet.y = enemy.y + enemyDimension.height/2 - 4;
 
-                let p = enemy.bulletPoint.localToGlobal(this.x, this.y);
-                let xP = Math.round(Math.abs(this._level.x) + p.x);
-                let yP = Math.round(Math.abs(this._level.y) + p.y);
-
                 this._enemyBullets.push(bullet);
-
-                createjs.Tween.get(bullet).to({x:xP,y:yP},enemy.getBulletSpeed());
+                this._game.moveEnemyBullet(bullet,enemy.bulletPoint,enemy.getBulletSpeed());
             }
+        }
+    };
+
+    p.checkActiveBullets = function(player) {
+        let i = this._enemyBullets.length-1;
+        if(i < 0){return;}
+        const playerDimension = player.getDimension();
+        for(i; i > -1; i--){
+            const bullet = this._enemyBullets[i];
+            if(bullet.x > this._game.LEVEL_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > this._game.LEVEL_HEIGHT){
+                this._enemyBullets.splice(i,1);
+                this._enemyAmmo.push(bullet);
+                bullet.visible = false;
+            }else{
+                if(bullet.x > player.x && bullet.x < (player.x + playerDimension.width)){
+                    if(bullet.y > player.y && bullet.y < (player.y + playerDimension.height)){
+                        this._enemyBullets.splice(i,1);
+                        this._enemyAmmo.push(bullet);
+                        bullet.visible = false;
+                        this._game.enemyHitsPlayer(this._enemiesController.getEnemiesDamage());
+                    }
+                }
+            }
+        }
+    };
+
+    p.moveActiveEnemies = function(pX, pY, pDimension) {
+        let i = this._activeEnemies.length - 1;
+        if(i < 0){return;}
+        for(i; i > -1; i--){
+            const enemy = this._activeEnemies[i];
+            const speed = enemy.getMovementSpeed(); // todo staviti da bude u level params posto svakako moraju svi da se krecu istom brzinom
+            const xDifference = Math.abs(pX - enemy.x);
+            const yDifference = Math.abs(pY - enemy.y);
+            if(pX > enemy.x){
+                if(this._checkRightLeft(i,'right') === true){
+                    if(xDifference > speed){
+                        enemy.x += speed;
+                    }
+                }
+            }else if(pX < enemy.x){
+                if(this._checkRightLeft(i,'left') === true) {
+                    if(xDifference > speed){
+                        enemy.x -= speed;
+                    }
+                }
+            }
+            if(pY > enemy.y){
+                if(this._checkUpDown(i, 'up') === true){
+                    if(yDifference > speed){
+                        enemy.y += speed;
+                    }
+                }
+            }
+            if(pY < enemy.y){
+                if(this._checkUpDown(i, 'down') === true) {
+                    if (yDifference > speed) {
+                        enemy.y -= speed;
+                    }
+                }
+            }
+            const enemyDimension = enemy.getDimension();
+            let angleDeg = Math.atan2((enemy.y + enemyDimension.height/2) - (pY + (pDimension.height/2)), (enemy.x + enemyDimension.width/2) - (pX + (pDimension.width/2))) * 180 / Math.PI;
+            angleDeg -= 90;
+            enemy.rotateGun(Math.round(angleDeg));
+            enemy.incrementShootingCooldown();
         }
     };
 
