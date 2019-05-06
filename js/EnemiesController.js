@@ -50,7 +50,7 @@ this.system = this.system || {};
 
         enemy.x = xSpawn;
         enemy.y = ySpawn;
-        enemy.setMovementSpeed(this._movementSpeed);
+        //enemy.setMovementSpeed(this._movementSpeed);
 
         const shootingCooldown = system.CustomMethods.getRandomNumberFromTo(50, 500);
         enemy.setShootinCooldown(shootingCooldown);
@@ -209,7 +209,7 @@ this.system = this.system || {};
                         this._enemyBullets.splice(i,1);
                         this._enemyAmmo.push(bullet);
                         bullet.visible = false;
-                        this._game.enemyHitsPlayer(this._enemiesController.getEnemiesDamage());
+                        this._game.enemyHitsPlayer(this.getEnemiesDamage());
                     }
                 }
             }
@@ -221,7 +221,8 @@ this.system = this.system || {};
         if(i < 0){return;}
         for(i; i > -1; i--){
             const enemy = this._activeEnemies[i];
-            const speed = enemy.getMovementSpeed(); // todo staviti da bude u level params posto svakako moraju svi da se krecu istom brzinom
+            //const speed = enemy.getMovementSpeed(); // todo staviti da bude u level params posto svakako moraju svi da se krecu istom brzinom
+            const speed = this._movementSpeed;
             const xDifference = Math.abs(pX - enemy.x);
             const yDifference = Math.abs(pY - enemy.y);
             if(pX > enemy.x){

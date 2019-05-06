@@ -17,15 +17,43 @@ this.system = this.system || {};
             'enemiesDamage':8,
             'maxNumberOfActiveEnemies':4,
             'maxNumberOfEnemies':7,
-            'color':'#82ff9a',
+            'color':'#fffd2f',
             'movementSpeed':3
         },
         'level3':{
             'enemiesDamage':10,
             'maxNumberOfActiveEnemies':5,
             'maxNumberOfEnemies':10,
-            'color':'#8474ff',
+            'color':'#ff9331',
             'movementSpeed':4
+        },
+        'level4':{
+            'enemiesDamage':13,
+            'maxNumberOfActiveEnemies':6,
+            'maxNumberOfEnemies':13,
+            'color':'#5dff7c',
+            'movementSpeed':5
+        },
+        'level5':{
+            'enemiesDamage':15,
+            'maxNumberOfActiveEnemies':7,
+            'maxNumberOfEnemies':15,
+            'color':'#5178ff',
+            'movementSpeed':5
+        },
+        'level6':{
+            'enemiesDamage':17,
+            'maxNumberOfActiveEnemies':8,
+            'maxNumberOfEnemies':17,
+            'color':'#ad5914',
+            'movementSpeed':6
+        },
+        'level7':{
+            'enemiesDamage':20,
+            'maxNumberOfActiveEnemies':10,
+            'maxNumberOfEnemies':20,
+            'color':'#000000',
+            'movementSpeed':8
         }
     };
 

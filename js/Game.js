@@ -17,20 +17,12 @@ this.system = this.system || {};
     
     p._enemiesController = null;
 
-    //p._enemies = null;
-    //p._enemiesDamage = null;
-    //p._enemyAmmo = null;
-    //p._enemyBullets = null;
-    //p._activeEnemies = null;
-    //p._maxNumberOfActiveEnemies = null;
-    //p._maxNumberOfEnemies = null;
-    //p._enemiesCounter = null;
-
     p._level = null;
     p._currentLevel = null;
     p._fpsText = null;
+    p._waveInfo = null;
 
-    p._gameOver = false;
+    p._gameOver = true;
 
     p._CAMERA_WIDTH = null;
     p._CAMERA_HEIGHT = null;
@@ -49,18 +41,20 @@ this.system = this.system || {};
     p._DOWN_AREA_BORDER = null;
 
     p._init = function () {
+        this._CAMERA_WIDTH = stage.canvas.width;
+        this._CAMERA_HEIGHT = stage.canvas.height;
+
         this._enemiesController = new system.EnemiesController(this);
         
         this._playerAmmo = [];
         this._playerBullets = [];
 
-        //this._enemyAmmo = [];
-        //this._enemyBullets = [];
-
-        //this._enemies = [];
-        //this._activeEnemies = [];
-
         this._currentLevel = 1;
+
+        const waveInfo = this._waveInfo = new system.WaveInfo();
+        waveInfo.x = this._CAMERA_WIDTH/2;
+        waveInfo.y = this._CAMERA_HEIGHT/2;
+        waveInfo.scaleX = waveInfo.scaleY = 0;
 
         this._setLevelParameters();
 
@@ -81,9 +75,8 @@ this.system = this.system || {};
         fps.x = 100;
         fps.y = 100;
         this.addChild(fps);
+        this.addChild(waveInfo);
         // SETTING CONSTANTS
-        this._CAMERA_WIDTH = stage.canvas.width;
-        this._CAMERA_HEIGHT = stage.canvas.height;
 
         this.LEVEL_WIDTH = back.image.width;
         this.LEVEL_HEIGHT = back.image.height;
@@ -131,13 +124,11 @@ this.system = this.system || {};
         // ADDING EVENT LISTENERS
         setInterval(()=>{
             if(this._gameOver === false) {
-                //this._enemyShoot();
-                //this._manageEnemies();
+                this._enemiesController.enemyShoot();
                 this._enemiesController.manageEnemies();
             }
         },1000);
 
-        //this._addEnemies(3);
         this._enemiesController.addEnemies(3);
 
 /*        setTimeout(()=>{
@@ -145,27 +136,32 @@ this.system = this.system || {};
         },3000);*/
     };
 
+    p._showWaveInfo = function() {
+        this._waveInfo.visible = true;
+        createjs.Tween.get(this._waveInfo).to({scaleX:1, scaleY:1}, 500, createjs.Ease.quadIn).wait(5000).call(()=>{
+            createjs.Tween.get(this._waveInfo).to({scaleX:0, scaleY:0}, 500, createjs.Ease.quadOut).call(()=>{
+                this._waveInfo.visible = false;
+                this._gameOver = false;
+            });
+        });
+    };
+
     p._setLevelParameters = function() {
         console.log(`setting parameters for level ${this._currentLevel}`);
         const parameters = system.LevelParameters.getParametersForLevel(this._currentLevel);
         this._enemiesController.setEnemiesParameters(parameters);
-/*        this._enemiesDamage = parameters.enemiesDamage;
-        this._setMaxNumberOfActiveEnemies(parameters.maxNumberOfActiveEnemies);
-        this._setMaxNumberOfEnemies(parameters.maxNumberOfEnemies);*/
-    };
 
-/*    p._manageEnemies = function() {
-        if(this._enemiesCounter < this._maxNumberOfEnemies){
-            if(this._activeEnemies.length < this._maxNumberOfActiveEnemies){
-                this._addEnemy();
-            }
-        }else{
-            if(this._activeEnemies.length === 0){
-                console.log('no more enemies');
-                this._levelPassed();
-            }
-        }
-    };*/
+        const waveInfo = {
+            'waveNumber':this._currentLevel,
+            'numberOfEnemies':parameters.maxNumberOfEnemies,
+            'numberOfActiveEnemies':parameters.maxNumberOfActiveEnemies,
+            'enemiesDamage':parameters.enemiesDamage
+        };
+
+        this._waveInfo.updateTextFields(waveInfo);
+
+        this._showWaveInfo();
+    };
 
     p._addButtons = function() {
         const fsButtonImage = system.CustomMethods.makeImage('fsButton', true, false);
@@ -177,20 +173,6 @@ this.system = this.system || {};
         fsButton.y = 25;
         this.addChild(fsButton);
     };
-
-/*    p._setMaxNumberOfEnemies = function(num) {
-        this._maxNumberOfEnemies = num;
-    };
-
-    p._setMaxNumberOfActiveEnemies = function(num) {
-        this._maxNumberOfActiveEnemies = num;
-    };*/
-
-/*    p._addEnemies = function(numOfEnemies) {
-        for(let i = 0; i < numOfEnemies; i++) {
-            this._addEnemy();
-        }
-    };*/
 
     p._playerShoot = function(mouseX, mouseY) {
         const playerDimension = this._player.getDimension();
@@ -274,10 +256,6 @@ this.system = this.system || {};
                 }
             }
         });
-    };
-
-    p._enemyShoot = function() {
-        this._enemiesController.enemyShoot();
     };
 
     p._handleKey = function(key, bool) {
@@ -428,10 +406,6 @@ this.system = this.system || {};
         this._gameOver = true;
         this._currentLevel++;
         this._setLevelParameters();
-        setTimeout(()=>{
-            console.log('starting next level');
-            this._gameOver = false;
-        },3000);
     };
 
     p.enemyHitsPlayer = function(damage) {

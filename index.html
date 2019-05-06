@@ -13,6 +13,7 @@
     <script src="js/Game.js"></script>
     <script src="js/LevelParameters.js"></script>
     <script src="js/EnemiesController.js"></script>
+    <script src="js/WaveInfo.js"></script>
     <script>
 
         "use strict";
@@ -88,14 +89,13 @@
             queue.on("progress", handleProgress);
             queue.loadManifest([
                 {id: "background", src:"assets/background.jpg"},
-                {id: "playerBody", src:"assets/playerBody.png"},
-                {id: "enemyBody", src:"assets/enemyBody.png"},
                 {id: "playerGun", src:"assets/playerGun.png"},
                 {id: "playerGunOverlay", src:"assets/playerGunOverlay.png"},
                 {id: "enemyGun", src:"assets/enemyGun.png"},
                 {id: "bullet", src:"assets/bullet.jpg"},
                 {id: "cursor", src:"assets/cursor.png"},
-                {id: "fsButton", src:"assets/fsButton.jpg"}
+                {id: "fsButton", src:"assets/fsButton.jpg"},
+                {id: "waveInfo", src:"assets/waveInfo.jpg"}
             ]);
         }
 

@@ -26,10 +26,11 @@ this.system = this.system || {};
     p.bulletPoint = null;
 
     p._init = function () {
-        this._healthColor = '#35eb34';
+        this._healthColor = '#000000';
 
         const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#000000').drawRect(0, 0, 64, 64));
         body.cache(0,0,64,64);
+        body.mouseEnabled = false;
 
         const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, 56, 56)); // body width - stroke
         health.cache(0,0,56,56);
@@ -37,6 +38,7 @@ this.system = this.system || {};
         health.y = 4; // stroke/2
         health.originalWidth = 56;
         health.originalHeight = 56;
+        health.mouseEnabled = false;
 
         this.addChild(body,health);
 
@@ -64,14 +66,13 @@ this.system = this.system || {};
         this._startHealth = 100;
         this._health = this._startHealth;
 
-        this.mouseChildren = false;
+        this.mouseEnabled = false;
     };
 
     p.updateColor = function(color) {
-        //this._healthShape.uncache();
         if(this._healthColor !== color){
-            this._healthShape.color = this._healthColor;
-            this._healthShape.updateCache();
+            this._healthColor = color;
+            this._updateHealthBar(0,0,this._healthShape.originalWidth, this._healthShape.originalHeight);
         }
     };
 
@@ -118,13 +119,13 @@ this.system = this.system || {};
         return canShoot;
     };
 
-    p.setMovementSpeed = function(speed) {
+/*    p.setMovementSpeed = function(speed) {
         this._speed = speed;
     };
 
     p.getMovementSpeed = function() {
         return this._speed;
-    };
+    };*/
 
     p.rotateGun = function(deg) {
         this._gun.rotation = deg;
