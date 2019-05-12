@@ -155,6 +155,7 @@ this.system = this.system || {};
                         enemy.reset();
                         this._activeEnemies.splice(e,1);
                         this._enemies.push(enemy);
+                        this._game.updateEnemiesCounter();
                     }
                     console.log('player hits enemy');
                     return true;

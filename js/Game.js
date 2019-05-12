@@ -16,6 +16,7 @@ this.system = this.system || {};
     p._playerBullets = null;
     
     p._enemiesController = null;
+    p._enemiesCounter = null;
 
     p._level = null;
     p._currentLevel = null;
@@ -76,6 +77,12 @@ this.system = this.system || {};
         fps.y = 100;
         this.addChild(fps);
         this.addChild(waveInfo);
+
+        const enemiesCounter = this._enemiesCounter = new system.EnemiesCounter();
+        enemiesCounter.x = 960;
+        enemiesCounter.y = 50;
+        this.addChild(enemiesCounter);
+
         // SETTING CONSTANTS
 
         this.LEVEL_WIDTH = back.image.width;
@@ -136,10 +143,13 @@ this.system = this.system || {};
         },3000);*/
     };
 
-    p._showWaveInfo = function() {
+    p._showWaveInfo = function(waveInfoParams) {
+        this._waveInfo.updateTextFields(waveInfoParams);
         this._waveInfo.visible = true;
         createjs.Tween.get(this._waveInfo).to({scaleX:1, scaleY:1}, 500, createjs.Ease.quadIn).wait(5000).call(()=>{
             createjs.Tween.get(this._waveInfo).to({scaleX:0, scaleY:0}, 500, createjs.Ease.quadOut).call(()=>{
+                this._enemiesCounter.resetCounter();
+                this._enemiesCounter.updateTotal(waveInfoParams.numberOfEnemies);
                 this._waveInfo.visible = false;
                 this._gameOver = false;
             });
@@ -158,9 +168,7 @@ this.system = this.system || {};
             'enemiesDamage':parameters.enemiesDamage
         };
 
-        this._waveInfo.updateTextFields(waveInfo);
-
-        this._showWaveInfo();
+        this._showWaveInfo(waveInfo);
     };
 
     p._addButtons = function() {
@@ -416,6 +424,10 @@ this.system = this.system || {};
             this._gameOver = true;
             console.log('game over');
         }
+    };
+
+    p.updateEnemiesCounter = function() {
+        this._enemiesCounter.updateCounter();
     };
 
     p.render = function(e){

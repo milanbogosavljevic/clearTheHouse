@@ -14,6 +14,7 @@ this.system = this.system || {};
     p._width = null;
     p._height = null;
     p._gun = null;
+    p._gunImage = null;
     p._bulletSpeed = null;
     p._damage = null;
     p._shootingCooldown = null;
@@ -42,19 +43,23 @@ this.system = this.system || {};
 
         this.addChild(body,health);
 
-        const gunImg = this._gun = system.CustomMethods.makeImage('enemyGun', false, false);
+        const gunImg = this._gunImage = system.CustomMethods.makeImage('enemyGun', false, false);
         const gun = this._gun = new createjs.Container();
         gun.regX = gunImg.image.width/2;
         gun.regY = gunImg.image.height;
         gun.x = body.bitmapCache.width/2;
         gun.y = body.bitmapCache.height/2;
 
+        const gunOverlay = system.CustomMethods.makeImage('enemyGunOverlay', false, true);
+        gunOverlay.x = gunImg.image.width/2;
+        gunOverlay.y = gunImg.image.height;
+
         const bulletPoint = this.bulletPoint = system.CustomMethods.makeImage('bullet', false, false);
         bulletPoint.x = 4;
         bulletPoint.y = -4400;// mora da bude veci broj posto je spawn u razmaku od -100 do 0
         bulletPoint.visible = false;
 
-        gun.addChild(gunImg,bulletPoint);
+        gun.addChild(gunImg,gunOverlay,bulletPoint);
 
         this.addChild(gun);
 
@@ -113,10 +118,16 @@ this.system = this.system || {};
     p.canShoot = function() {
         let canShoot = false;
         if(this._shootingCooldownCounter > this._shootingCooldown){
+            this._doShootAnimation();
             canShoot = true;
             this._shootingCooldownCounter = 0;
         }
         return canShoot;
+    };
+
+    p._doShootAnimation = function() {
+        //todo ovde
+        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn);
     };
 
 /*    p.setMovementSpeed = function(speed) {
