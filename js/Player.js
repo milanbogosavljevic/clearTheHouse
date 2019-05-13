@@ -69,17 +69,25 @@ this.system = this.system || {};
     };
 
     p.decreaseHealth = function(damage) {
-        //console.log('hit');
         this._health -= damage;
-        const healthPercent = system.CustomMethods.getPercentage(this._startHealth, this._health);
+        this._updateHealthBar();
+    };
+
+    p.increaseHealth = function(hp) {
+        this._health += hp;
+        this._updateHealthBar();
+    };
+
+    p._updateHealthBar = function() {
+        let healthPercent = system.CustomMethods.getPercentage(this._startHealth, this._health);
+        if(healthPercent > 100){
+            healthPercent = 100;
+        }
         const w = this._healthShape.originalWidth;
         const h = (this._healthShape.originalHeight/100) * healthPercent;
         const x = 0;
         const y = this._healthShape.originalHeight - h;
-        this._updateHealthBar(x,y,w,h);
-    };
 
-    p._updateHealthBar = function(x,y,w,h) {
         this._healthShape.uncache();
         this._healthShape.graphics.clear().beginFill(this._healthColor).drawRect(x, y, w, h);
         this._healthShape.cache(x, y, w, h);
@@ -87,6 +95,10 @@ this.system = this.system || {};
 
     p.getHealth = function() {
         return this._health;
+    };
+
+    p.getHealthColor = function() {
+        return this._healthColor;
     };
 
     p.getDamage = function() {

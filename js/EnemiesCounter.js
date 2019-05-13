@@ -24,14 +24,14 @@ this.system = this.system || {};
 
         this._enemiesCounterNum = 0;
 
-        let enemiesCounter = this._enemiesCounter = system.CustomMethods.makeText(this._enemiesCounterNum, '50px Arial', '#fff', 'right', 'middle');
-        enemiesCounter.x = 65;
+        let enemiesCounter = this._enemiesCounter = system.CustomMethods.makeText(this._enemiesCounterNum, '50px Arial', '#fff', 'center', 'middle');
+        enemiesCounter.x = 55;
 
-        const divider = system.CustomMethods.makeText('/', '50px Arial', '#fff', 'center', 'middle');
+        const divider = system.CustomMethods.makeText(':', '50px Arial', '#fff', 'center', 'middle');
         divider.x = 102;
 
-        let enemiesTotal = this._enemiesTotal = system.CustomMethods.makeText('0', '50px Arial', '#fff', 'left', 'middle');
-        enemiesTotal.x = 140;
+        let enemiesTotal = this._enemiesTotal = system.CustomMethods.makeText('0', '50px Arial', '#fff', 'center', 'middle');
+        enemiesTotal.x = 150;
 
         enemiesCounter.y = divider.y = enemiesTotal.y = txtY;
 

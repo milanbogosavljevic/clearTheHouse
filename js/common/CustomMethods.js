@@ -145,5 +145,32 @@ this.system = this.system || {};
         }
     };
 
+    CustomMethods.addParticleAnimation = function(xPos, yPos, color, number, size, minRange, maxRange, parent) {
+        const particleContainer = new createjs.Container();
+        particleContainer.x = xPos;
+        particleContainer.y = yPos;
+        parent.addChild(particleContainer);
+        for(let i = 0; i < number; i++){
+            const particle = new createjs.Shape(new createjs.Graphics().beginFill(color).drawRect(0, 0, size, size));
+            particle.mouseEnabled = false;
+            particle.regX = particle.regY = size/2;
+            particleContainer.addChild(particle);
+        }
+
+        let particleCounter = 0;
+        for(let p = 0; p < number; p++){
+            const particle = particleContainer.getChildAt(p);
+            const xPos = system.CustomMethods.getRandomNumberFromTo(minRange,maxRange);
+            const yPos = system.CustomMethods.getRandomNumberFromTo(minRange,maxRange);
+            createjs.Tween.get(particle).to({x:xPos,y:yPos,alpha:0.1,rotation:270},500).call(()=>{
+                particleContainer.removeChild(particle);
+                particleCounter++;
+                if(particleCounter === number){
+                    parent.removeChild(particleContainer);
+                }
+            });
+        }
+    };
+
     system.CustomMethods = CustomMethods;
 })();

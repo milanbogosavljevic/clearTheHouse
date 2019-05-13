@@ -394,6 +394,10 @@ this.system = this.system || {};
         this._fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS());
     };
 
+    p.showParticles = function(xPos, yPos, color, number, size, minRange, maxRange) {
+        system.CustomMethods.addParticleAnimation(xPos, yPos, color, number, size, minRange, maxRange, this._level);
+    };
+
     p.addEnemyBullet = function(bullet) {
         this._level.addChild(bullet);
     };
@@ -422,6 +426,11 @@ this.system = this.system || {};
         if(this._player.getHealth() < 1) {
             this._player.visible = false;
             this._gameOver = true;
+            const playerDimension = this._player.getDimension();
+            const xPos = this._player.x + (playerDimension.width/2);
+            const yPos = this._player.y + (playerDimension.height/2);
+            const color = this._player.getHealthColor();
+            this.showParticles(xPos, yPos, color, 80, 20, -400, 400);
             console.log('game over');
         }
     };

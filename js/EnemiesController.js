@@ -156,8 +156,11 @@ this.system = this.system || {};
                         this._activeEnemies.splice(e,1);
                         this._enemies.push(enemy);
                         this._game.updateEnemiesCounter();
+                        const enemyX = enemy.x + (dimension.width/2);
+                        const enemyY = enemy.y + (dimension.height/2);
+                        const color = this._getHealthColor();
+                        this._game.showParticles(enemyX, enemyY, color, 40, 10, -200, 200);
                     }
-                    console.log('player hits enemy');
                     return true;
                 }
             }
@@ -259,6 +262,10 @@ this.system = this.system || {};
             enemy.rotateGun(Math.round(angleDeg));
             enemy.incrementShootingCooldown();
         }
+    };
+
+    p._getHealthColor = function() {
+        return this._healthColor;
     };
 
     system.EnemiesController = EnemiesController;

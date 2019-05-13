@@ -118,17 +118,16 @@ this.system = this.system || {};
     p.canShoot = function() {
         let canShoot = false;
         if(this._shootingCooldownCounter > this._shootingCooldown){
-            this._doShootAnimation();
+            //this._doShootAnimation();
             canShoot = true;
             this._shootingCooldownCounter = 0;
         }
         return canShoot;
     };
 
-    p._doShootAnimation = function() {
-        //todo ovde
-        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn);
-    };
+/*    p._doShootAnimation = function() { // mozda nema poente posto se slabo vidi animacija
+        createjs.Tween.get(this._gunImage).to({y:4},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn);
+    };*/
 
 /*    p.setMovementSpeed = function(speed) {
         this._speed = speed;
