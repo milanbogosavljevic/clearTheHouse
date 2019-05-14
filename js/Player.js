@@ -23,6 +23,10 @@ this.system = this.system || {};
     p._healthShape = null;
     p._healthColor = null;
 
+    p._damageUpgrades = null;
+    p._healthUpgrades = null;
+    p._speedUpgrades = null;
+
     p.bulletPoint = null;
 
     p._init = function () {
@@ -62,10 +66,14 @@ this.system = this.system || {};
         this._width = body.bitmapCache.width;
         this._height = body.bitmapCache.height;
         this._canShoot = true;
-        this._damage = 30;
+        this._damage = 100;
         this._startHealth = 100;
+        this._speed = 15;
         this._health = this._startHealth;
-        this.mouseChildren = false;
+        this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
+        this._damageUpgrades = [5, 8, 10, 13, 16];
+        this._healthUpgrades = [10, 15, 20, 25, 30];
+        this._speedUpgrades = [3, 4, 6, 8, 10];
     };
 
     p.decreaseHealth = function(damage) {
@@ -73,7 +81,9 @@ this.system = this.system || {};
         this._updateHealthBar();
     };
 
-    p.increaseHealth = function(hp) {
+    p.increaseHealth = function() {
+        const hp = this._healthUpgrades.shift();
+        console.log(`increasing health for ${hp}`);
         this._health += hp;
         this._updateHealthBar();
     };
@@ -99,6 +109,12 @@ this.system = this.system || {};
 
     p.getHealthColor = function() {
         return this._healthColor;
+    };
+
+    p.increaseDamage = function() {
+        const damage = this._damageUpgrades.shift();
+        console.log(`increasing damage for ${damage}`);
+        this._damage += damage;
     };
 
     p.getDamage = function() {
@@ -131,12 +147,28 @@ this.system = this.system || {};
         }
     };
 
-    p.setMovementSpeed = function(speed) {
-        this._speed = speed;
+    p.increaseSpeed = function() {
+        const increment = this._speedUpgrades.shift();
+        console.log(`increasing speed ${ typeof increment}`);
+        this._speed += increment;
     };
 
     p.getMovementSpeed = function() {
         return this._speed;
+    };
+
+    p.getUpgradeValue = function(upgrade) {
+        const upgradeType = `_${upgrade.toLowerCase()}Upgrades`;
+        console.log(upgradeType);
+        return this[upgradeType][0];
+    };
+
+    p.getStartingUpgradeValues = function() {
+        return {
+            'damage':this._damageUpgrades[0],
+            'health':this._healthUpgrades[0],
+            'speed':this._speedUpgrades[0]
+        }
     };
 
     system.Player = createjs.promote(Player,"Container");

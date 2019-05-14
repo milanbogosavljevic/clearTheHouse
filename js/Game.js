@@ -22,6 +22,7 @@ this.system = this.system || {};
     p._currentLevel = null;
     p._fpsText = null;
     p._waveInfo = null;
+    p._upgradePanel = null;
 
     p._gameOver = true;
 
@@ -66,7 +67,6 @@ this.system = this.system || {};
         const player = this._player = new system.Player();
         player.x = 960;
         player.y = 540;
-        player.setMovementSpeed(10);
         this._setPlayerMovement();
 
         this._level.addChild(back, player);
@@ -82,6 +82,15 @@ this.system = this.system || {};
         enemiesCounter.x = 960;
         enemiesCounter.y = 50;
         this.addChild(enemiesCounter);
+
+        const startingUpgradeValues = this._player.getStartingUpgradeValues();
+        const upgradePanel = this._upgradePanel = new system.UpgradePanel(this, startingUpgradeValues);
+        upgradePanel.x = 960 - 200; // image width/2
+        upgradePanel.y = -300;
+        upgradePanel.visible = false;
+        this.addChild(upgradePanel);
+
+
 
         // SETTING CONSTANTS
 
@@ -136,11 +145,43 @@ this.system = this.system || {};
             }
         },1000);
 
-        this._enemiesController.addEnemies(3);
+        //this._enemiesController.addEnemies(3);
 
 /*        setTimeout(()=>{
             player.setMovementSpeed(6);
         },3000);*/
+
+/*        setTimeout(()=>{
+            this._showUpgradePanel(true);
+        },1000);*/
+
+    };
+
+    p._showUpgradePanel = function(show, upgradeSelected) {
+        this._upgradePanel.enableButtons(false);
+        let yPos;
+        if(show === true){
+            yPos = 200;
+            this._upgradePanel.visible = true;
+        }else{
+            yPos = -300;
+        }
+        createjs.Tween.get(this._upgradePanel).wait(500).to({y:yPos},500, createjs.Ease.quadInOut).call(()=>{
+            this._upgradePanel.enableButtons(show);
+            if(show === false) {
+                this._setLevelParameters();
+                this._upgradePanel.visible = false;
+                const nextUpgradeValue = this._player.getUpgradeValue(upgradeSelected);
+                this._upgradePanel.updateTextField(upgradeSelected, nextUpgradeValue);
+            }
+        });
+    };
+
+    p.onUpgradeSelected = function(upgrade) {
+        console.log(`upgrade selected ${upgrade}`);
+        const method = `increase${upgrade}`;
+        this._player[method]();
+        this._showUpgradePanel(false, upgrade);
     };
 
     p._showWaveInfo = function(waveInfoParams) {
@@ -417,7 +458,7 @@ this.system = this.system || {};
     p.levelPassed = function() {
         this._gameOver = true;
         this._currentLevel++;
-        this._setLevelParameters();
+        this._showUpgradePanel(true);
     };
 
     p.enemyHitsPlayer = function(damage) {

@@ -15,8 +15,8 @@ this.system = this.system || {};
 
     p._init = function (img) {
         this._body = img;
-        this._body.regX = img.image.width/2;
-        this._body.regY = img.image.height/2;
+        this.regX = img.image.width/2;
+        this.regY = img.image.height/2;
         this.addChild(this._body);
     };
 
