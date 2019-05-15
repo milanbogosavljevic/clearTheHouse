@@ -81,7 +81,7 @@ this.system = this.system || {};
 
         const enemiesCounter = this._enemiesCounter = new system.EnemiesCounter();
         enemiesCounter.x = 960;
-        enemiesCounter.y = 50;
+        enemiesCounter.y = 60;
         this.addChild(enemiesCounter);
 
         const startingUpgradeValues = this._player.getStartingUpgradeValues();

@@ -68,11 +68,11 @@ this.system = this.system || {};
         this._canShoot = true;
         this._damage = 10;
         this._startHealth = 100;
-        this._speed = 5;
+        this._speed = 6;
         this._health = this._startHealth;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
         this._damageUpgrades = [5, 8, 10, 13, 16];
-        this._healthUpgrades = [10, 15, 20, 25, 30];
+        this._healthUpgrades = [15, 20, 25, 30, 35];
         this._speedUpgrades = [3, 4, 6, 8, 10];
     };
 
