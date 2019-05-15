@@ -23,6 +23,7 @@ this.system = this.system || {};
     p._fpsText = null;
     p._waveInfo = null;
     p._upgradePanel = null;
+    p._playerStatsPanel = null;
 
     p._gameOver = true;
 
@@ -74,7 +75,7 @@ this.system = this.system || {};
 
         let fps = this._fpsText = system.CustomMethods.makeText('', '50px Arial', '#fff', 'center', 'middle');
         fps.x = 100;
-        fps.y = 100;
+        fps.y = 800;
         this.addChild(fps);
         this.addChild(waveInfo);
 
@@ -90,7 +91,15 @@ this.system = this.system || {};
         upgradePanel.visible = false;
         this.addChild(upgradePanel);
 
-
+        const startingStatsValues = {
+            'damage':this._player.getDamage(),
+            'health':this._player.getHealth(),
+            'speed':this._player.getSpeed()
+        };
+        const playerStatsPanel = this._playerStatsPanel = new system.PlayerStats(startingStatsValues);
+        playerStatsPanel.x = 10;
+        playerStatsPanel.y = 10;
+        this.addChild(playerStatsPanel);
 
         // SETTING CONSTANTS
 
@@ -182,6 +191,8 @@ this.system = this.system || {};
         const method = `increase${upgrade}`;
         this._player[method]();
         this._showUpgradePanel(false, upgrade);
+        const getNewValueMethod = `get${upgrade.charAt(0).toUpperCase() + upgrade.slice(1)}`;
+        this._playerStatsPanel.updateTextField(upgrade, this._player[getNewValueMethod]());
     };
 
     p._showWaveInfo = function(waveInfoParams) {
@@ -218,8 +229,8 @@ this.system = this.system || {};
         fsButton.addEventListener('click', (e)=>{
             system.CustomMethods.toggleFullScreen();
         });
-        fsButton.x = 1895;
-        fsButton.y = 25;
+        fsButton.x = 1885;
+        fsButton.y = 35;
         this.addChild(fsButton);
     };
 
@@ -340,7 +351,7 @@ this.system = this.system || {};
     };
 
     p._movePlayer = function() {
-        const movementSpeed = this._player.getMovementSpeed();
+        const movementSpeed = this._player.getSpeed();
         if(this._playerMovement.left === true){
             if(this._player.x > this._PLAYER_LEFT_BORDER){
                 this._player.x -= movementSpeed;
@@ -368,7 +379,7 @@ this.system = this.system || {};
     };
 
     p._moveLevel = function() {
-        const movementSpeed = this._player.getMovementSpeed();
+        const movementSpeed = this._player.getSpeed();
         if(this._playerMovement.right === true){
             if(this._player.x > this._LEFT_AREA_BORDER){
                 if(this._level.x > -(this._CAMERA_WIDTH)){
@@ -463,6 +474,7 @@ this.system = this.system || {};
 
     p.enemyHitsPlayer = function(damage) {
         this._player.decreaseHealth(damage);
+        this._playerStatsPanel.updateTextField('health', this._player.getHealth());
         this._shakeStage();
         if(this._player.getHealth() < 1) {
             this._player.visible = false;

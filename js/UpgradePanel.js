@@ -37,7 +37,7 @@ this.system = this.system || {};
         damageButton.y = buttonsYPos;
         damageButton.on('click', ()=>{
             damageButton.doScaleAnimation();
-            this._game.onUpgradeSelected('Damage');
+            this._game.onUpgradeSelected('damage');
         });
         let damageIncrementer = this._damageIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.damage}`, '36px Arial', '#ffffff', 'center', 'middle');
         damageIncrementer.x = damageButton.x;
@@ -49,7 +49,7 @@ this.system = this.system || {};
         healthButton.y = buttonsYPos;
         healthButton.on('click', ()=>{
             healthButton.doScaleAnimation();
-            this._game.onUpgradeSelected('Health');
+            this._game.onUpgradeSelected('health');
         });
         let healthIncrementer = this._healthIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.health}`, '36px Arial', '#ffffff', 'center', 'middle');
         healthIncrementer.x = healthButton.x;
@@ -61,7 +61,7 @@ this.system = this.system || {};
         speedButton.y = buttonsYPos;
         speedButton.on('click', ()=>{
             speedButton.doScaleAnimation();
-            this._game.onUpgradeSelected('Speed');
+            this._game.onUpgradeSelected('speed');
         });
         let speedIncrementer = this._speedIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.speed}`, '36px Arial', '#ffffff', 'center', 'middle');
         speedIncrementer.x = speedButton.x;
@@ -72,7 +72,7 @@ this.system = this.system || {};
     };
 
     p.updateTextField = function(type, value) {
-        const txtField = `_${type.toLowerCase()}IncrementerTxt`;
+        const txtField = `_${type}IncrementerTxt`;
         console.log(txtField);
         this[txtField].text = `+${value}`;
 

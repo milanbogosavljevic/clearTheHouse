@@ -66,9 +66,9 @@ this.system = this.system || {};
         this._width = body.bitmapCache.width;
         this._height = body.bitmapCache.height;
         this._canShoot = true;
-        this._damage = 100;
+        this._damage = 10;
         this._startHealth = 100;
-        this._speed = 15;
+        this._speed = 5;
         this._health = this._startHealth;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
         this._damageUpgrades = [5, 8, 10, 13, 16];
@@ -81,7 +81,7 @@ this.system = this.system || {};
         this._updateHealthBar();
     };
 
-    p.increaseHealth = function() {
+    p.increasehealth = function() {
         const hp = this._healthUpgrades.shift();
         console.log(`increasing health for ${hp}`);
         this._health += hp;
@@ -111,7 +111,7 @@ this.system = this.system || {};
         return this._healthColor;
     };
 
-    p.increaseDamage = function() {
+    p.increasedamage = function() {
         const damage = this._damageUpgrades.shift();
         console.log(`increasing damage for ${damage}`);
         this._damage += damage;
@@ -147,18 +147,18 @@ this.system = this.system || {};
         }
     };
 
-    p.increaseSpeed = function() {
+    p.increasespeed = function() {
         const increment = this._speedUpgrades.shift();
         console.log(`increasing speed ${ typeof increment}`);
         this._speed += increment;
     };
 
-    p.getMovementSpeed = function() {
+    p.getSpeed = function() {
         return this._speed;
     };
 
     p.getUpgradeValue = function(upgrade) {
-        const upgradeType = `_${upgrade.toLowerCase()}Upgrades`;
+        const upgradeType = `_${upgrade}Upgrades`;
         console.log(upgradeType);
         return this[upgradeType][0];
     };
