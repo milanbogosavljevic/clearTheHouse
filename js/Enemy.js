@@ -22,6 +22,7 @@ this.system = this.system || {};
     p._startHealth = null;
     p._health = null;
     p._healthShape = null;
+    p._body = null;
     p._healthColor = null;
 
     p.bulletPoint = null;
@@ -29,7 +30,7 @@ this.system = this.system || {};
     p._init = function () {
         this._healthColor = '#000000';
 
-        const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#000000').drawRect(0, 0, 64, 64));
+        const body = this._body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#ffffff').drawRect(0, 0, 64, 64));
         body.cache(0,0,64,64);
         body.mouseEnabled = false;
 
@@ -78,12 +79,19 @@ this.system = this.system || {};
         if(this._healthColor !== color){
             this._healthColor = color;
             this._updateHealthBar(0,0,this._healthShape.originalWidth, this._healthShape.originalHeight);
+            this._updateBody();
         }
     };
 
     p.reset = function() {
         this._health = this._startHealth;
-        this._updateHealthBar(0,0,this._healthShape.originalWidth,this._healthShape.originalHeight)
+        this._updateHealthBar(0,0,this._healthShape.originalWidth,this._healthShape.originalHeight);
+    };
+
+    p._updateBody = function() {
+        this._body.uncache();
+        this._body.graphics.clear().setStrokeStyle(8).beginStroke(this._healthColor).drawRect(0, 0, 64, 64);
+        this._body.cache(0,0,64,64);
     };
 
     p.decreaseHealth = function(damage) {
@@ -124,18 +132,6 @@ this.system = this.system || {};
         }
         return canShoot;
     };
-
-/*    p._doShootAnimation = function() { // mozda nema poente posto se slabo vidi animacija
-        createjs.Tween.get(this._gunImage).to({y:4},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn);
-    };*/
-
-/*    p.setMovementSpeed = function(speed) {
-        this._speed = speed;
-    };
-
-    p.getMovementSpeed = function() {
-        return this._speed;
-    };*/
 
     p.rotateGun = function(deg) {
         this._gun.rotation = deg;

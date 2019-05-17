@@ -31,15 +31,15 @@ this.system = this.system || {};
 
     p._init = function () {
         this._healthColor = '#ff6468';
-        const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#000000').drawRect(0, 0, 128, 128));
-        body.cache(0,0,128,128);
+        const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#ff6468').drawRect(0, 0, 64, 64));
+        body.cache(0,0,64,64);
 
-        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, 120, 120)); // body width - stroke/2
-        health.cache(0,0,120,120);
-        health.x = 4;
+        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, 56, 56)); // body width - stroke
+        health.cache(0,0,56,56);
+        health.x = 4;//stroke/2
         health.y = 4;
-        health.originalWidth = 120;
-        health.originalHeight = 120;
+        health.originalWidth = 56;
+        health.originalHeight = 56;
 
         this.addChild(body,health);
 
@@ -72,8 +72,8 @@ this.system = this.system || {};
         this._health = this._startHealth;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
         this._damageUpgrades = [5, 8, 10, 13, 16];
-        this._healthUpgrades = [15, 20, 25, 30, 35];
-        this._speedUpgrades = [3, 4, 6, 8, 10];
+        this._healthUpgrades = [15, 20, 30, 40, 50];
+        this._speedUpgrades = [2, 2, 3, 3, 4];
     };
 
     p.decreaseHealth = function(damage) {
@@ -148,9 +148,7 @@ this.system = this.system || {};
     };
 
     p.increasespeed = function() {
-        const increment = this._speedUpgrades.shift();
-        console.log(`increasing speed ${ typeof increment}`);
-        this._speed += increment;
+        this._speed += this._speedUpgrades.shift();
     };
 
     p.getSpeed = function() {

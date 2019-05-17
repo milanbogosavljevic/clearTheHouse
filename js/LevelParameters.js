@@ -52,7 +52,7 @@ this.system = this.system || {};
             'enemiesDamage':20,
             'maxNumberOfActiveEnemies':10,
             'maxNumberOfEnemies':20,
-            'color':'#000000',
+            'color':'#ff172d',
             'movementSpeed':8
         }
     };

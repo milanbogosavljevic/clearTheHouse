@@ -483,7 +483,7 @@ this.system = this.system || {};
             const xPos = this._player.x + (playerDimension.width/2);
             const yPos = this._player.y + (playerDimension.height/2);
             const color = this._player.getHealthColor();
-            this.showParticles(xPos, yPos, color, 80, 20, -400, 400);
+            this.showParticles(xPos, yPos, color, 80, 10, -400, 400);
             console.log('game over');
         }
     };
