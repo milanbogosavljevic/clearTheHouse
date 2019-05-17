@@ -16,23 +16,23 @@ this.system = this.system || {};
         'level2':{
             'enemiesDamage':8,
             'maxNumberOfActiveEnemies':4,
-            'maxNumberOfEnemies':7,
+            'maxNumberOfEnemies':6,
             'color':'#fffd2f',
-            'movementSpeed':3
+            'movementSpeed':2
         },
         'level3':{
             'enemiesDamage':10,
             'maxNumberOfActiveEnemies':5,
             'maxNumberOfEnemies':10,
             'color':'#ff9331',
-            'movementSpeed':4
+            'movementSpeed':3
         },
         'level4':{
             'enemiesDamage':13,
             'maxNumberOfActiveEnemies':6,
             'maxNumberOfEnemies':13,
             'color':'#5dff7c',
-            'movementSpeed':5
+            'movementSpeed':4
         },
         'level5':{
             'enemiesDamage':15,
@@ -53,7 +53,7 @@ this.system = this.system || {};
             'maxNumberOfActiveEnemies':10,
             'maxNumberOfEnemies':20,
             'color':'#ff172d',
-            'movementSpeed':8
+            'movementSpeed':7
         }
     };
 
