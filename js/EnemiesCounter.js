@@ -22,19 +22,15 @@ this.system = this.system || {};
 
         this._enemiesCounterNum = 0;
 
-        let enemiesCounter = this._enemiesCounter = system.CustomMethods.makeText(this._enemiesCounterNum, '50px Arial', '#000000', 'center', 'middle');
-        enemiesCounter.x = 55;
-        enemiesCounter.y = 55;
+        let enemiesCounter = this._enemiesCounter = system.CustomMethods.makeText(this._enemiesCounterNum, '44px Teko', '#000000', 'center', 'middle');
+        enemiesCounter.x = 38;
+        enemiesCounter.y = 44;
 
-        const divider = system.CustomMethods.makeText(':', '50px Arial', '#000000', 'center', 'middle');
-        divider.x = 102;
-        divider.y = 50;
+        let enemiesTotal = this._enemiesTotal = system.CustomMethods.makeText('0', '44px Teko', '#000000', 'center', 'middle');
+        enemiesTotal.x = 113;
+        enemiesTotal.y = enemiesCounter.y;
 
-        let enemiesTotal = this._enemiesTotal = system.CustomMethods.makeText('0', '50px Arial', '#000000', 'center', 'middle');
-        enemiesTotal.x = 150;
-        enemiesTotal.y = 55;
-
-        this.addChild(enemiesCounter, divider, enemiesTotal);
+        this.addChild(enemiesCounter, enemiesTotal);
     };
 
     p.updateCounter = function() {

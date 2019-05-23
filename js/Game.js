@@ -73,7 +73,7 @@ this.system = this.system || {};
         this._level.addChild(back, player);
         this.addChild(this._level);
 
-        let fps = this._fpsText = system.CustomMethods.makeText('', '50px Arial', '#fff', 'center', 'middle');
+        let fps = this._fpsText = system.CustomMethods.makeText('', '50px Teko', '#fff', 'center', 'middle');
         fps.x = 100;
         fps.y = 800;
         this.addChild(fps);
@@ -433,6 +433,7 @@ this.system = this.system || {};
                     this._playerAmmo.push(bullet);
                     this._playerBullets.splice(i,1);
                     bullet.visible = false;
+                    this._playerStatsPanel.increaseScore(bulletDamage);
                 }
             }
         }

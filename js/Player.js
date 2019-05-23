@@ -73,7 +73,7 @@ this.system = this.system || {};
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
         this._damageUpgrades = [5, 8, 10, 13, 16];
         this._healthUpgrades = [15, 20, 30, 40, 50];
-        this._speedUpgrades = [1, 2, 2, 3, 3];
+        this._speedUpgrades = [1, 1, 2, 2, 3];
     };
 
     p.decreaseHealth = function(damage) {

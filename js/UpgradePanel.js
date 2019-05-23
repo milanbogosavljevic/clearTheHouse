@@ -23,7 +23,7 @@ this.system = this.system || {};
         const back = system.CustomMethods.makeImage('upgradePanelBack', false, false);
         this.addChild(back);
 
-        const heading = system.CustomMethods.makeText('CHOOSE UPGRADE', '30px Arial', '#ffffff', 'center', 'middle');
+        const heading = system.CustomMethods.makeText('CHOOSE UPGRADE', '30px Teko', '#ffffff', 'center', 'middle');
         heading.x = back.image.width/2;
         heading.y = 46;
         this.addChild(heading);
@@ -39,7 +39,7 @@ this.system = this.system || {};
             damageButton.doScaleAnimation();
             this._game.onUpgradeSelected('damage');
         });
-        let damageIncrementer = this._damageIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.damage}`, '36px Arial', '#ffffff', 'center', 'middle');
+        let damageIncrementer = this._damageIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.damage}`, '36px Teko', '#ffffff', 'center', 'middle');
         damageIncrementer.x = damageButton.x;
         damageIncrementer.y = textsYPos;
 
@@ -51,7 +51,7 @@ this.system = this.system || {};
             healthButton.doScaleAnimation();
             this._game.onUpgradeSelected('health');
         });
-        let healthIncrementer = this._healthIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.health}`, '36px Arial', '#ffffff', 'center', 'middle');
+        let healthIncrementer = this._healthIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.health}`, '36px Teko', '#ffffff', 'center', 'middle');
         healthIncrementer.x = healthButton.x;
         healthIncrementer.y = textsYPos;
 
@@ -63,7 +63,7 @@ this.system = this.system || {};
             speedButton.doScaleAnimation();
             this._game.onUpgradeSelected('speed');
         });
-        let speedIncrementer = this._speedIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.speed}`, '36px Arial', '#ffffff', 'center', 'middle');
+        let speedIncrementer = this._speedIncrementerTxt = system.CustomMethods.makeText(`+${startingUpgradeValues.speed}`, '36px Teko', '#ffffff', 'center', 'middle');
         speedIncrementer.x = speedButton.x;
         speedIncrementer.y = textsYPos;
 

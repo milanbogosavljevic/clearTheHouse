@@ -45,7 +45,7 @@
 
         function loadFontManifest() {
             loadFonts({
-                src: ['fonts/AVENGEANCE.ttf'],
+                src: ['fonts/Teko.otf'],
                 type: "font"
             });
             return false;
@@ -65,21 +65,21 @@
             e.remove();
             console.log('set preload images');
             let background = new createjs.Shape();
-            background.graphics.beginFill("black").drawRect(0,0,1920,1080);
+            background.graphics.beginFill("#000000").drawRect(0,0,1920,1080);
             background.cache(0,0,1920,1080);
 
             preloaderImage = system.CustomMethods.makeImage('preloaderImage', false);
-            preloaderImage.x = 530;
-            preloaderImage.y = 395;
+            preloaderImage.x = 440;
+            preloaderImage.y = 360;
 
             preloaderMask = system.CustomMethods.makeImage('preloaderMask', false);
             preloaderMask.rotation = 180;
-            preloaderMask.x = preloaderImage.x + 857;
-            preloaderMask.y = preloaderImage.y + 236;
+            preloaderMask.x = preloaderImage.x + preloaderImage.image.width;
+            preloaderMask.y = preloaderImage.y + preloaderImage.image.height;
 
-            percentLoaded = system.CustomMethods.makeText("0" , "90px Avengeance" , "white", 'center', 'middle');
-            percentLoaded.x = 1920/2;
-            percentLoaded.y = 750;
+            percentLoaded = system.CustomMethods.makeText("0" , "90px Teko" , "white", 'center', 'middle');
+            percentLoaded.x = 960;
+            percentLoaded.y = 770;
 
             stage.addChild(background, preloaderImage, preloaderMask, percentLoaded);
             startAssetsLoading();
