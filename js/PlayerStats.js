@@ -41,7 +41,7 @@ this.system = this.system || {};
         this.addChild(damage, health, speed, score);
     };
 
-    p._getScore = function() {
+    p.getScore = function() {
         return this._score;
     };
 

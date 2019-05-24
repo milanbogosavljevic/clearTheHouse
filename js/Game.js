@@ -24,6 +24,7 @@ this.system = this.system || {};
     p._waveInfo = null;
     p._upgradePanel = null;
     p._playerStatsPanel = null;
+    p._gameoverPanel = null;
 
     p._gameOver = true;
 
@@ -79,6 +80,13 @@ this.system = this.system || {};
         this.addChild(fps);
         this.addChild(waveInfo);
 
+        const highscore = 500; // todo uzeti iz localStorage
+        const gameoverPanel = this._gameoverPanel = new system.GameoverPanel(this, highscore);
+        gameoverPanel.x = 760;
+        gameoverPanel.y = -300;
+        gameoverPanel.visible = false;
+        this.addChild(gameoverPanel);
+
         const enemiesCounter = this._enemiesCounter = new system.EnemiesCounter();
         enemiesCounter.x = 960;
         enemiesCounter.y = 60;
@@ -86,7 +94,7 @@ this.system = this.system || {};
 
         const startingUpgradeValues = this._player.getStartingUpgradeValues();
         const upgradePanel = this._upgradePanel = new system.UpgradePanel(this, startingUpgradeValues);
-        upgradePanel.x = 960 - 200; // image width/2
+        upgradePanel.x = 760;
         upgradePanel.y = -300;
         upgradePanel.visible = false;
         this.addChild(upgradePanel);
@@ -154,6 +162,10 @@ this.system = this.system || {};
             }
         },1000);
 
+/*        setTimeout(()=>{
+            this._showGameoverPanel(true);
+        },3000);*/
+
         //this._enemiesController.addEnemies(3);
 
 /*        setTimeout(()=>{
@@ -164,6 +176,30 @@ this.system = this.system || {};
             this._showUpgradePanel(true);
         },1000);*/
 
+    };
+
+    p._showGameoverPanel = function(show) {
+        const currentScore = this._playerStatsPanel.getScore();
+        const highScore = 500; // todo uzeti iz localStorage
+        if(currentScore > highScore){
+            this._gameoverPanel.updateTextField('highscore', currentScore);
+        }
+        this._gameoverPanel.updateTextField('score', currentScore);
+        this._gameoverPanel.enableButtons(false);
+        let yPos;
+        if(show === true){
+            yPos = 200;
+            this._gameoverPanel.visible = true;
+        }else{
+            yPos = -300;
+        }
+        createjs.Tween.get(this._gameoverPanel).wait(1000).to({y:yPos},500, createjs.Ease.quadInOut).call(()=>{
+            if(show === false) {
+                this._gameoverPanel.visible = false;
+            }else{
+                this._gameoverPanel.enableButtons(true);
+            }
+        });
     };
 
     p._showUpgradePanel = function(show, upgradeSelected) {
@@ -485,12 +521,17 @@ this.system = this.system || {};
             const yPos = this._player.y + (playerDimension.height/2);
             const color = this._player.getHealthColor();
             this.showParticles(xPos, yPos, color, 80, 10, -400, 400);
+            this._showGameoverPanel(true);
             console.log('game over');
         }
     };
 
     p.updateEnemiesCounter = function() {
         this._enemiesCounter.updateCounter();
+    };
+
+    p.onReset = function() {
+        this._showGameoverPanel(false);
     };
 
     p.render = function(e){
