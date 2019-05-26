@@ -42,7 +42,7 @@ this.system = this.system || {};
     };
 
     p.getScore = function() {
-        return this._score;
+        return this._scoreNum;
     };
 
     p.updateTextField = function(type, value) {

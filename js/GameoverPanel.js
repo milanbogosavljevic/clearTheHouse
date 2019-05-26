@@ -58,7 +58,7 @@ this.system = this.system || {};
 
     p.updateTextField = function(type, value) {// todo ovde, logovati value
         const txtField = `_${type}`;
-        this[txtField].text = `+${value}`;
+        this[txtField].text = `${value}`;
     };
 
     p.enableButtons = function(enable) {
