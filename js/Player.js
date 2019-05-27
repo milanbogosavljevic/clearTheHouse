@@ -35,8 +35,8 @@ this.system = this.system || {};
     p.bulletPoint = null;
 
     p._init = function () {
-        this._START_DAMAGE = 100;
-        this._START_HEALTH = 10;
+        this._START_DAMAGE = 10;
+        this._START_HEALTH = 100;
         this._START_SPEED = 6;
 
         const highscore = this._highscore = JSON.parse(localStorage.getItem("highscore"));
@@ -102,8 +102,7 @@ this.system = this.system || {};
     };
 
     p.increasehealth = function() {
-        const hp = this._healthUpgrades.shift();
-        this._health += hp;
+        this._health += this._healthUpgrades.shift();
         this._updateHealthBar();
     };
 
@@ -194,11 +193,9 @@ this.system = this.system || {};
     p.setHighscore = function(score) {
         this._highscore = score;
         localStorage.setItem("highscore" , JSON.stringify(this._highscore));
-        console.log(`setuje hs ${this._highscore}`)
     };
 
     p.getHighscore = function() {
-        console.log(`get hs ${this._highscore}`);
         return this._highscore;
     };
 

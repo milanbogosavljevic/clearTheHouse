@@ -491,6 +491,9 @@ this.system = this.system || {};
         this._enemiesController.resetCounter();
         this._enemiesController.addEnemies(3);
         this._enemiesCounter.resetCounter();
+
+        const startingUpgradeValues = this._player.getStartingUpgradeValues();
+        this._upgradePanel.resetPanel(startingUpgradeValues);
     };
 
     p.onUpgradeSelected = function(upgrade) {
@@ -567,6 +570,7 @@ this.system = this.system || {};
         //console.log(this._playerAmmo.length);
         //console.log(this._level.numChildren);
         //console.log(this._enemies.length);
+        //console.log(this._player._damageUpgrades);
     };
 
     system.Game = createjs.promote(Game,"Container");

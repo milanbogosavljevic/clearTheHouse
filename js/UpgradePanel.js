@@ -13,7 +13,7 @@ this.system = this.system || {};
     p._game = null;
     p._buttons = null;
     p._damageIncrementerTxt = null;
-    p._healtIncrementerTxt = null;
+    p._healthIncrementerTxt = null;
     p._speedIncrementerTxt = null;
 
     p._init = function (game, startingUpgradeValues) {
@@ -73,10 +73,13 @@ this.system = this.system || {};
 
     p.updateTextField = function(type, value) {
         const txtField = `_${type}IncrementerTxt`;
-        console.log(txtField);
         this[txtField].text = `+${value}`;
+    };
 
-        console.log(`updating ${type}  with value  ${value}`);
+    p.resetPanel = function(values) {
+        this._damageIncrementerTxt.text = `+${values.damage}`;
+        this._healthIncrementerTxt.text = `+${values.health}`;
+        this._speedIncrementerTxt.text = `+${values.speed}`;
     };
 
     p.enableButtons = function(enable) {
