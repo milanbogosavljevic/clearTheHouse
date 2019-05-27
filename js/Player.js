@@ -10,6 +10,10 @@ this.system = this.system || {};
 
     const p = createjs.extend(Player,createjs.Container);
 
+    p._START_SPEED = null;
+    p._START_DAMAGE = null;
+    p._START_HEALTH = null;
+
     p._speed = null;
     p._width = null;
     p._height = null;
@@ -18,7 +22,6 @@ this.system = this.system || {};
     p._bulletSpeed = null;
     p._canShoot = null;
     p._damage = null;
-    p._startHealth = null;
     p._health = null;
     p._healthShape = null;
     p._healthColor = null;
@@ -27,9 +30,20 @@ this.system = this.system || {};
     p._healthUpgrades = null;
     p._speedUpgrades = null;
 
+    p._highscore = null;
+
     p.bulletPoint = null;
 
     p._init = function () {
+        this._START_DAMAGE = 100;
+        this._START_HEALTH = 10;
+        this._START_SPEED = 6;
+
+        const highscore = this._highscore = JSON.parse(localStorage.getItem("highscore"));
+        if(highscore === null){
+            localStorage.setItem("highscore" , JSON.stringify(0));
+        }
+
         this._healthColor = '#ff6468';
         const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#ff6468').drawRect(0, 0, 64, 64));
         body.cache(0,0,64,64);
@@ -66,14 +80,20 @@ this.system = this.system || {};
         this._width = body.bitmapCache.width;
         this._height = body.bitmapCache.height;
         this._canShoot = true;
-        this._damage = 10;
-        this._startHealth = 100;
-        this._speed = 6;
-        this._health = this._startHealth;
+        this._damage = this._START_DAMAGE;
+        this._speed = this._START_SPEED;
+        this._health = this._START_HEALTH;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
         this._damageUpgrades = [5, 8, 10, 13, 16];
         this._healthUpgrades = [15, 20, 30, 40, 50];
         this._speedUpgrades = [1, 1, 2, 2, 3];
+    };
+
+    p.resetPlayer = function() {
+        this._damage = this._START_DAMAGE;
+        this._health = this._START_HEALTH;
+        this._speed = this._START_SPEED;
+        this._updateHealthBar();
     };
 
     p.decreaseHealth = function(damage) {
@@ -83,13 +103,12 @@ this.system = this.system || {};
 
     p.increasehealth = function() {
         const hp = this._healthUpgrades.shift();
-        console.log(`increasing health for ${hp}`);
         this._health += hp;
         this._updateHealthBar();
     };
 
     p._updateHealthBar = function() {
-        let healthPercent = system.CustomMethods.getPercentage(this._startHealth, this._health);
+        let healthPercent = system.CustomMethods.getPercentage(this._START_HEALTH, this._health);
         if(healthPercent > 100){
             healthPercent = 100;
         }
@@ -112,9 +131,7 @@ this.system = this.system || {};
     };
 
     p.increasedamage = function() {
-        const damage = this._damageUpgrades.shift();
-        console.log(`increasing damage for ${damage}`);
-        this._damage += damage;
+        this._damage += this._damageUpgrades.shift();
     };
 
     p.getDamage = function() {
@@ -157,7 +174,6 @@ this.system = this.system || {};
 
     p.getUpgradeValue = function(upgrade) {
         const upgradeType = `_${upgrade}Upgrades`;
-        console.log(upgradeType);
         return this[upgradeType][0];
     };
 
@@ -167,6 +183,23 @@ this.system = this.system || {};
             'health':this._healthUpgrades[0],
             'speed':this._speedUpgrades[0]
         }
+    };
+
+    p.resetUpgrades = function() {
+        this._damageUpgrades = [5, 8, 10, 13, 16];
+        this._healthUpgrades = [15, 20, 30, 40, 50];
+        this._speedUpgrades = [1, 1, 2, 2, 3];
+    };
+
+    p.setHighscore = function(score) {
+        this._highscore = score;
+        localStorage.setItem("highscore" , JSON.stringify(this._highscore));
+        console.log(`setuje hs ${this._highscore}`)
+    };
+
+    p.getHighscore = function() {
+        console.log(`get hs ${this._highscore}`);
+        return this._highscore;
     };
 
     system.Player = createjs.promote(Player,"Container");

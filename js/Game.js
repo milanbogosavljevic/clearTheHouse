@@ -80,13 +80,6 @@ this.system = this.system || {};
         this.addChild(fps);
         this.addChild(waveInfo);
 
-        const highscore = 500; // todo uzeti iz localStorage
-        const gameoverPanel = this._gameoverPanel = new system.GameoverPanel(this, highscore);
-        gameoverPanel.x = 760;
-        gameoverPanel.y = -300;
-        gameoverPanel.visible = false;
-        this.addChild(gameoverPanel);
-
         const enemiesCounter = this._enemiesCounter = new system.EnemiesCounter();
         enemiesCounter.x = 960;
         enemiesCounter.y = 60;
@@ -108,6 +101,13 @@ this.system = this.system || {};
         playerStatsPanel.x = 10;
         playerStatsPanel.y = 10;
         this.addChild(playerStatsPanel);
+
+        const highscore = this._player.getHighscore();
+        const gameoverPanel = this._gameoverPanel = new system.GameoverPanel(this, highscore);
+        gameoverPanel.x = 760;
+        gameoverPanel.y = -300;
+        gameoverPanel.visible = false;
+        this.addChild(gameoverPanel);
 
         // SETTING CONSTANTS
 
@@ -180,9 +180,10 @@ this.system = this.system || {};
 
     p._showGameoverPanel = function(show) {
         const currentScore = this._playerStatsPanel.getScore();
-        const highScore = 500; // todo uzeti iz localStorage
+        const highScore = this._player.getHighscore();
         if(currentScore > highScore){
             this._gameoverPanel.updateTextField('highscore', currentScore);
+            this._player.setHighscore(currentScore);
         }
         this._gameoverPanel.updateTextField('score', currentScore);
         this._gameoverPanel.enableButtons(false);
@@ -195,6 +196,9 @@ this.system = this.system || {};
         }
         createjs.Tween.get(this._gameoverPanel).wait(1000).to({y:yPos},500, createjs.Ease.quadInOut).call(()=>{
             if(show === false) {
+                this._currentLevel = 1;
+                this._setLevelParameters();
+                this._resetGame();
                 this._gameoverPanel.visible = false;
             }else{
                 this._gameoverPanel.enableButtons(true);
@@ -220,15 +224,6 @@ this.system = this.system || {};
                 this._upgradePanel.updateTextField(upgradeSelected, nextUpgradeValue);
             }
         });
-    };
-
-    p.onUpgradeSelected = function(upgrade) {
-        console.log(`upgrade selected ${upgrade}`);
-        const method = `increase${upgrade}`;
-        this._player[method]();
-        this._showUpgradePanel(false, upgrade);
-        const getNewValueMethod = `get${upgrade.charAt(0).toUpperCase() + upgrade.slice(1)}`;
-        this._playerStatsPanel.updateTextField(upgrade, this._player[getNewValueMethod]());
     };
 
     p._showWaveInfo = function(waveInfoParams) {
@@ -334,7 +329,6 @@ this.system = this.system || {};
             }
         }
 
-        //createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
         let bulletTween = createjs.Tween.get(bull).to({x:xP,y:yP},this._player.getBulletSpeed());
 
         this._player.doShootAnimation();
@@ -481,6 +475,30 @@ this.system = this.system || {};
 
     p._updateFps = function() {
         this._fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS());
+    };
+
+    p._resetGame = function() {
+        this._player.resetPlayer();
+        this._player.resetUpgrades();
+        this._player.visible = true;
+        const playerInfo = {
+            'damage':this._player.getDamage(),
+            'health':this._player.getHealth(),
+            'speed':this._player.getSpeed()
+        };
+        this._playerStatsPanel.resetStats(playerInfo);
+        this._enemiesController.clearEnemies();
+        this._enemiesController.resetCounter();
+        this._enemiesController.addEnemies(3);
+        this._enemiesCounter.resetCounter();
+    };
+
+    p.onUpgradeSelected = function(upgrade) {
+        const method = `increase${upgrade}`;
+        this._player[method]();
+        this._showUpgradePanel(false, upgrade);
+        const getNewValueMethod = `get${upgrade.charAt(0).toUpperCase() + upgrade.slice(1)}`;
+        this._playerStatsPanel.updateTextField(upgrade, this._player[getNewValueMethod]());
     };
 
     p.showParticles = function(xPos, yPos, color, number, size, minRange, maxRange) {

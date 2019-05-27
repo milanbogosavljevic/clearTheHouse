@@ -29,6 +29,7 @@ this.system = this.system || {};
         this._enemyAmmo = [];
         this._enemyBullets = [];
         this._movementSpeed = 0;
+        this._enemiesCounter = 0;
     };
 
     p._addEnemy = function() {
@@ -109,12 +110,18 @@ this.system = this.system || {};
         return canGo;
     };
 
+    p._getHealthColor = function() {
+        return this._healthColor;
+    };
+
     p.setEnemiesParameters = function(parameters) {
         this._enemiesDamage = parameters.enemiesDamage;
         this._maxNumberOfActiveEnemies = parameters.maxNumberOfActiveEnemies;
         this._maxNumberOfEnemies = parameters.maxNumberOfEnemies;
         this._healthColor = parameters.color;
         this._movementSpeed = parameters.movementSpeed;
+
+        console.log(`setting color ${this._healthColor}`);
     };
 
     p.getEnemiesDamage = function() {
@@ -138,6 +145,22 @@ this.system = this.system || {};
                 this._enemiesCounter = 0;
                 this._game.levelPassed();
             }
+        }
+    };
+
+    p.resetCounter = function() {
+        this._enemiesCounter = 0;
+    };
+
+    p.clearEnemies = function() {
+        let e = this._activeEnemies.length - 1;
+        for(e; e > -1; e--) {
+            const enemy = this._activeEnemies[e];
+            enemy.visible = false;
+            enemy.reset();
+            this._activeEnemies.splice(e,1);
+            this._enemies.push(enemy);
+            console.log(`clear enemy`);
         }
     };
 
@@ -262,10 +285,6 @@ this.system = this.system || {};
             enemy.rotateGun(Math.round(angleDeg));
             enemy.incrementShootingCooldown();
         }
-    };
-
-    p._getHealthColor = function() {
-        return this._healthColor;
     };
 
     system.EnemiesController = EnemiesController;

@@ -41,18 +41,9 @@ this.system = this.system || {};
         this.addChild(damage, health, speed, score);
     };
 
-    p.getScore = function() {
-        return this._scoreNum;
-    };
-
     p.updateTextField = function(type, value) {
         const txtField = `_${type}`;
         this[txtField].text = value;
-    };
-
-    p.increaseScore = function(incrementer) {
-        this._scoreNum += incrementer;
-        this.updateTextField('score', this._scoreNum);
     };
 
     p.resetStats = function(values) { // todo na reset dugme zvati
@@ -61,6 +52,15 @@ this.system = this.system || {};
         this._health.text = values.health;
         this._speed.text = values.speed;
         this._score.text = 0;
+    };
+
+    p.increaseScore = function(incrementer) {
+        this._scoreNum += incrementer;
+        this.updateTextField('score', this._scoreNum);
+    };
+
+    p.getScore = function() {
+        return this._scoreNum;
     };
 
     system.PlayerStats = createjs.promote(PlayerStats,"Container");

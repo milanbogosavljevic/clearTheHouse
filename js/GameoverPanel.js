@@ -56,7 +56,7 @@ this.system = this.system || {};
         this.addChild(heading, highscoreHeading, highscore, currentScore, score, resetButton)
     };
 
-    p.updateTextField = function(type, value) {// todo ovde, logovati value
+    p.updateTextField = function(type, value) {
         const txtField = `_${type}`;
         this[txtField].text = `${value}`;
     };
