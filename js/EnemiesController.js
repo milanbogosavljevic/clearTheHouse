@@ -16,6 +16,7 @@ this.system = this.system || {};
     p._maxNumberOfActiveEnemies = null;
     p._maxNumberOfEnemies = null;
     p._enemiesCounter = null;
+    p._enemiesHealth = null;
     p._enemiesDamage = null;
     p._enemyAmmo = null;
     p._enemyBullets = null;
@@ -45,6 +46,8 @@ this.system = this.system || {};
         }
 
         enemy.updateColor(this._healthColor);
+        enemy.updateStartHealth(this._enemiesHealth);
+        enemy.reset();
 
         const xSpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._game.LEVEL_WIDTH, (this._game.LEVEL_WIDTH + 100));
         const ySpawn = system.CustomMethods.getRandomBool() === true ? system.CustomMethods.getRandomNumberFromTo(-100, 0) : system.CustomMethods.getRandomNumberFromTo(this._game.LEVEL_HEIGHT, (this._game.LEVEL_HEIGHT + 100));
@@ -120,8 +123,7 @@ this.system = this.system || {};
         this._maxNumberOfEnemies = parameters.maxNumberOfEnemies;
         this._healthColor = parameters.color;
         this._movementSpeed = parameters.movementSpeed;
-
-        console.log(`setting color ${this._healthColor}`);
+        this._enemiesHealth = parameters.enemiesHealth;
     };
 
     p.getEnemiesDamage = function() {
@@ -157,7 +159,7 @@ this.system = this.system || {};
         for(e; e > -1; e--) {
             const enemy = this._activeEnemies[e];
             enemy.visible = false;
-            enemy.reset();
+            //enemy.reset();
             this._activeEnemies.splice(e,1);
             this._enemies.push(enemy);
             console.log(`clear enemy`);
@@ -175,7 +177,7 @@ this.system = this.system || {};
                     enemy.decreaseHealth(bulletDamage);
                     if(enemy.getHealth() < 1){
                         enemy.visible = false;
-                        enemy.reset();
+                        //enemy.reset();
                         this._activeEnemies.splice(e,1);
                         this._enemies.push(enemy);
                         this._game.updateEnemiesCounter();

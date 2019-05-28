@@ -8,6 +8,7 @@ this.system = this.system || {};
     LevelParameters.parameters = {
         'level1':{
             'enemiesDamage':5,
+            'enemiesHealth':100,
             'maxNumberOfActiveEnemies':3,
             'maxNumberOfEnemies':6,
             'color':'#ffffff',
@@ -15,6 +16,7 @@ this.system = this.system || {};
         },
         'level2':{
             'enemiesDamage':8,
+            'enemiesHealth':120,
             'maxNumberOfActiveEnemies':4,
             'maxNumberOfEnemies':6,
             'color':'#fffd2f',
@@ -22,6 +24,7 @@ this.system = this.system || {};
         },
         'level3':{
             'enemiesDamage':10,
+            'enemiesHealth':140,
             'maxNumberOfActiveEnemies':5,
             'maxNumberOfEnemies':10,
             'color':'#ff9331',
@@ -29,13 +32,15 @@ this.system = this.system || {};
         },
         'level4':{
             'enemiesDamage':13,
+            'enemiesHealth':160,
             'maxNumberOfActiveEnemies':6,
             'maxNumberOfEnemies':13,
-            'color':'#5dff7c',
+            'color':'#ff8d9e',
             'movementSpeed':4
         },
         'level5':{
             'enemiesDamage':15,
+            'enemiesHealth':180,
             'maxNumberOfActiveEnemies':7,
             'maxNumberOfEnemies':15,
             'color':'#5178ff',
@@ -43,13 +48,15 @@ this.system = this.system || {};
         },
         'level6':{
             'enemiesDamage':17,
+            'enemiesHealth':200,
             'maxNumberOfActiveEnemies':8,
             'maxNumberOfEnemies':17,
-            'color':'#ad5914',
+            'color':'#b60ad9',
             'movementSpeed':6
         },
         'level7':{
             'enemiesDamage':20,
+            'enemiesHealth':220,
             'maxNumberOfActiveEnemies':10,
             'maxNumberOfEnemies':20,
             'color':'#ff172d',

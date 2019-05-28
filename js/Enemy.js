@@ -30,16 +30,22 @@ this.system = this.system || {};
     p._init = function () {
         this._healthColor = '#000000';
 
-        const body = this._body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#ffffff').drawRect(0, 0, 64, 64));
-        body.cache(0,0,64,64);
+        const strokeTickness = 8;
+        const bodyWidth = 64;
+        const bodyHeight = 64;
+
+        const body = this._body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(strokeTickness).beginStroke('#ffffff').drawRect(0, 0, bodyWidth, bodyHeight));
+        body.cache(0,0,bodyWidth, bodyHeight);
         body.mouseEnabled = false;
 
-        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, 56, 56)); // body width - stroke
-        health.cache(0,0,56,56);
-        health.x = 4; // stroke/2
-        health.y = 4; // stroke/2
-        health.originalWidth = 56;
-        health.originalHeight = 56;
+        const healthWidth = bodyWidth - strokeTickness;
+        const healthHeight = bodyHeight - strokeTickness;
+        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, healthWidth, healthHeight));
+        health.cache(0,0,healthWidth, healthHeight);
+        health.x = strokeTickness/2;
+        health.y = strokeTickness/2;
+        health.originalWidth = healthWidth;
+        health.originalHeight = healthHeight;
         health.mouseEnabled = false;
 
         this.addChild(body,health);
@@ -69,16 +75,31 @@ this.system = this.system || {};
         this._height = body.bitmapCache.height;
 
         this._shootingCooldownCounter = 0;
-        this._startHealth = 100;
+        this._startHealth = 0;
         this._health = this._startHealth;
 
         this.mouseEnabled = false;
     };
 
+    p._updateBody = function() {
+        this._body.uncache();
+        this._body.graphics.clear().setStrokeStyle(8).beginStroke(this._healthColor).drawRect(0, 0, 64, 64);
+        this._body.cache(0,0,64,64);
+    };
+
+    p._updateHealthBar = function(x,y,w,h) {
+        this._healthShape.uncache();
+        this._healthShape.graphics.clear().beginFill(this._healthColor).drawRect(x, y, w, h);
+        this._healthShape.cache(x, y, w, h);
+    };
+
+    p.updateStartHealth = function(hp) {
+        this._startHealth = hp;
+    };
+
     p.updateColor = function(color) {
         if(this._healthColor !== color){
             this._healthColor = color;
-            this._updateHealthBar(0,0,this._healthShape.originalWidth, this._healthShape.originalHeight);
             this._updateBody();
         }
     };
@@ -88,14 +109,7 @@ this.system = this.system || {};
         this._updateHealthBar(0,0,this._healthShape.originalWidth,this._healthShape.originalHeight);
     };
 
-    p._updateBody = function() {
-        this._body.uncache();
-        this._body.graphics.clear().setStrokeStyle(8).beginStroke(this._healthColor).drawRect(0, 0, 64, 64);
-        this._body.cache(0,0,64,64);
-    };
-
     p.decreaseHealth = function(damage) {
-        //console.log('hit');
         this._health -= damage;
         const healthPercent = system.CustomMethods.getPercentage(this._startHealth, this._health);
         const w = this._healthShape.originalWidth;
@@ -103,12 +117,6 @@ this.system = this.system || {};
         const x = 0;
         const y = this._healthShape.originalHeight - h;
         this._updateHealthBar(x,y,w,h);
-    };
-
-    p._updateHealthBar = function(x,y,w,h) {
-        this._healthShape.uncache();
-        this._healthShape.graphics.clear().beginFill(this._healthColor).drawRect(x, y, w, h);
-        this._healthShape.cache(x, y, w, h);
     };
 
     p.getHealth = function() {

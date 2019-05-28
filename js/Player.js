@@ -13,6 +13,9 @@ this.system = this.system || {};
     p._START_SPEED = null;
     p._START_DAMAGE = null;
     p._START_HEALTH = null;
+    p._DAMAGE_UPGRADES = null;
+    p._HEALTH_UPGRADES = null;
+    p._SPEED_UPGRADES = null;
 
     p._speed = null;
     p._width = null;
@@ -25,6 +28,7 @@ this.system = this.system || {};
     p._health = null;
     p._healthShape = null;
     p._healthColor = null;
+    p._gunCooldown = null;
 
     p._damageUpgrades = null;
     p._healthUpgrades = null;
@@ -35,25 +39,38 @@ this.system = this.system || {};
     p.bulletPoint = null;
 
     p._init = function () {
-        this._START_DAMAGE = 10;
+        this._START_DAMAGE = 100;
         this._START_HEALTH = 100;
         this._START_SPEED = 6;
+
+        this._DAMAGE_UPGRADES = [5, 8, 10, 13, 16];
+        this._HEALTH_UPGRADES = [15, 20, 30, 40, 50];
+        this._SPEED_UPGRADES = [1, 1, 2, 2, 3];
+
+        this._gunCooldown = 200;
 
         const highscore = this._highscore = JSON.parse(localStorage.getItem("highscore"));
         if(highscore === null){
             localStorage.setItem("highscore" , JSON.stringify(0));
         }
 
-        this._healthColor = '#ff6468';
-        const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(8).beginStroke('#ff6468').drawRect(0, 0, 64, 64));
-        body.cache(0,0,64,64);
+        const strokeTickness = 8;
+        const bodyWidth = 64;
+        const bodyHeight = 64;
 
-        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, 56, 56)); // body width - stroke
-        health.cache(0,0,56,56);
-        health.x = 4;//stroke/2
-        health.y = 4;
-        health.originalWidth = 56;
-        health.originalHeight = 56;
+        this._healthColor = '#5dff7c';
+        const body = new createjs.Shape(new createjs.Graphics().setStrokeStyle(strokeTickness).beginStroke('#5dff7c').drawRect(0, 0, bodyWidth, bodyHeight));
+        body.cache(0,0,bodyWidth,bodyHeight);
+
+        const healthWidth = bodyWidth - strokeTickness;
+        const healthHeight = bodyHeight - strokeTickness;
+        const health = this._healthShape = new createjs.Shape(new createjs.Graphics().beginFill(this._healthColor).drawRect(0, 0, healthWidth, healthHeight));
+        health.cache(0,0,healthWidth,healthHeight);
+        health.x = strokeTickness/2;
+        health.y = strokeTickness/2;
+        health.originalWidth = healthWidth;
+        health.originalHeight = healthHeight;
+        health.mouseEnabled = false;
 
         this.addChild(body,health);
 
@@ -84,9 +101,9 @@ this.system = this.system || {};
         this._speed = this._START_SPEED;
         this._health = this._START_HEALTH;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
-        this._damageUpgrades = [5, 8, 10, 13, 16];
-        this._healthUpgrades = [15, 20, 30, 40, 50];
-        this._speedUpgrades = [1, 1, 2, 2, 3];
+        this._damageUpgrades = this._DAMAGE_UPGRADES.concat();
+        this._healthUpgrades = this._HEALTH_UPGRADES.concat();
+        this._speedUpgrades = this._SPEED_UPGRADES.concat();
     };
 
     p.resetPlayer = function() {
@@ -139,7 +156,7 @@ this.system = this.system || {};
 
     p.doShootAnimation = function() {
         this._canShoot = false;
-        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn).call(()=>{
+        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn).wait(this._gunCooldown).call(()=>{
             this._canShoot = true;
         })
     };
@@ -185,9 +202,9 @@ this.system = this.system || {};
     };
 
     p.resetUpgrades = function() {
-        this._damageUpgrades = [5, 8, 10, 13, 16];
-        this._healthUpgrades = [15, 20, 30, 40, 50];
-        this._speedUpgrades = [1, 1, 2, 2, 3];
+        this._damageUpgrades = this._DAMAGE_UPGRADES.concat();
+        this._healthUpgrades = this._HEALTH_UPGRADES.concat();
+        this._speedUpgrades = this._SPEED_UPGRADES.concat();
     };
 
     p.setHighscore = function(score) {

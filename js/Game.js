@@ -25,6 +25,8 @@ this.system = this.system || {};
     p._upgradePanel = null;
     p._playerStatsPanel = null;
     p._gameoverPanel = null;
+    p._cursor = null;
+    p._playerCountiniouslyShooting = null;
 
     p._gameOver = true;
 
@@ -47,6 +49,8 @@ this.system = this.system || {};
     p._init = function () {
         this._CAMERA_WIDTH = stage.canvas.width;
         this._CAMERA_HEIGHT = stage.canvas.height;
+        
+        this._playerCountiniouslyShooting = false;
 
         this._enemiesController = new system.EnemiesController(this);
         
@@ -73,12 +77,12 @@ this.system = this.system || {};
 
         this._level.addChild(back, player);
         this.addChild(this._level);
+        this.addChild(waveInfo);
 
-        let fps = this._fpsText = system.CustomMethods.makeText('', '50px Teko', '#fff', 'center', 'middle');
+/*        let fps = this._fpsText = system.CustomMethods.makeText('', '50px Teko', '#fff', 'center', 'middle');
         fps.x = 100;
         fps.y = 800;
-        this.addChild(fps);
-        this.addChild(waveInfo);
+        this.addChild(fps);*/
 
         const enemiesCounter = this._enemiesCounter = new system.EnemiesCounter();
         enemiesCounter.x = 960;
@@ -135,7 +139,7 @@ this.system = this.system || {};
 
         this._addButtons();
 
-        const cursor = system.CustomMethods.makeImage('cursor', false, true);
+        const cursor = this._cursor = system.CustomMethods.makeImage('cursor', false, true);
         this.addChild(cursor);
 
         stage.on('stagemousemove', (e)=>{
@@ -147,12 +151,13 @@ this.system = this.system || {};
             angleDeg -= 90;
             this._player.rotateGun(Math.round(angleDeg));
         });
+
         back.on('mousedown', (e)=>{ // click je pravio problem kada se uradi drag, nekad ne registruje event, stavljeno na back umesto na stage zbog dugmica
-            if(this._gameOver === false){
-                if(this._player.canShoot() === true){
-                    this._playerShoot(e.stageX, e.stageY);
-                }
-            }
+            this._playerCountiniouslyShooting = true;
+        });
+
+        back.on('pressup', (e)=>{
+            this._playerCountiniouslyShooting = false;
         });
         // ADDING EVENT LISTENERS
         setInterval(()=>{
@@ -176,6 +181,14 @@ this.system = this.system || {};
             this._showUpgradePanel(true);
         },1000);*/
 
+    };
+
+    p._playerShooting = function() {
+        if(this._playerCountiniouslyShooting === true){
+            if(this._player.canShoot() === true){
+                this._playerShoot();
+            }
+        }
     };
 
     p._showGameoverPanel = function(show) {
@@ -265,11 +278,11 @@ this.system = this.system || {};
         this.addChild(fsButton);
     };
 
-    p._playerShoot = function(mouseX, mouseY) {
+    p._playerShoot = function() {
         const playerDimension = this._player.getDimension();
 
         let point = this._player.localToGlobal(this.x, this.y);
-        let angleDeg = Math.atan2((point.y + playerDimension.height/2) - mouseY, (point.x + playerDimension.width/2) - mouseX) * 180 / Math.PI;
+        let angleDeg = Math.atan2((point.y + playerDimension.height/2) - this._cursor.y, (point.x + playerDimension.width/2) - this._cursor.x) * 180 / Math.PI;
         angleDeg -= 90;
         this._player.rotateGun(Math.round(angleDeg));
 
@@ -298,7 +311,7 @@ this.system = this.system || {};
         let startTime = 0;
         let checkTime = true;
         //bull.visible = false;
-        let mousePoint = this._level.globalToLocal(mouseX,mouseY);
+        let mousePoint = this._level.globalToLocal(this._cursor.x,this._cursor.y);
         let timeToShowBullet = 10;
         if(this._playerMovement.left === true){
             if(mousePoint.x < this._player.x){
@@ -562,15 +575,17 @@ this.system = this.system || {};
             this._moveLevel();
             this._checkIfEnemyHitsPlayer();
             this._checkEnemyHits();
+            this._playerShooting();
         }
-        this._updateFps();
+        //this._updateFps();
         stage.update(e);
         //console.log(this._enemyBullets.length);
         //console.log(this._playerBullets.length);
         //console.log(this._playerAmmo.length);
         //console.log(this._level.numChildren);
         //console.log(this._enemies.length);
-        //console.log(this._player._damageUpgrades);
+        //console.log(this._player._DAMAGE_UPGRADES);
+        //console.log(this._enemiesController._enemiesHealth);
     };
 
     system.Game = createjs.promote(Game,"Container");
