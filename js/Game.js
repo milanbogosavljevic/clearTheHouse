@@ -261,7 +261,8 @@ this.system = this.system || {};
             'waveNumber':this._currentLevel,
             'numberOfEnemies':parameters.maxNumberOfEnemies,
             'numberOfActiveEnemies':parameters.maxNumberOfActiveEnemies,
-            'enemiesDamage':parameters.enemiesDamage
+            'enemiesDamage':parameters.enemiesDamage,
+            'enemiesHealth':parameters.enemiesHealth
         };
 
         this._showWaveInfo(waveInfo);

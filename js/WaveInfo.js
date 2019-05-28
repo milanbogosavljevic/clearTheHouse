@@ -14,6 +14,7 @@ this.system = this.system || {};
     p._numberOfEnemies = null;
     p._numberOfActiveEnemies = null;
     p._enemiesDamage = null;
+    p._enemiesHealth = null;
 
     p._init = function () {
         const back = system.CustomMethods.makeImage('waveInfo', false, true);
@@ -42,7 +43,12 @@ this.system = this.system || {};
         const enemiesDamage = this._enemiesDamage = system.CustomMethods.makeText('0', '30px Teko', '#ffff36', 'center', 'middle');
         enemiesDamage.y = damage.y + spacing2;
 
-        this.addChild(currentWave, waveNumber, enemies, numberOfEnemies, activeEnemies, numberOfActiveEnemies, damage, enemiesDamage);
+        const health = system.CustomMethods.makeText('Enemies Health', '30px Teko', '#fff', 'center', 'middle');
+        health.y = damage.y + spacing;
+        const enemiesHealth = this._enemiesHealth = system.CustomMethods.makeText('0', '30px Teko', '#ffff36', 'center', 'middle');
+        enemiesHealth.y = health.y + spacing2;
+
+        this.addChild(currentWave, waveNumber, enemies, numberOfEnemies, activeEnemies, numberOfActiveEnemies, damage, enemiesDamage, health, enemiesHealth);
     };
 
     p.updateTextFields = function(info) {
@@ -50,6 +56,8 @@ this.system = this.system || {};
         this._numberOfEnemies.text = info.numberOfEnemies;
         this._numberOfActiveEnemies.text = info.numberOfActiveEnemies;
         this._enemiesDamage.text = info.enemiesDamage;
+        this._enemiesHealth.text = info.enemiesHealth;
+        console.log(`info ${info.enemiesHealth}`);
     };
 
     system.WaveInfo = createjs.promote(WaveInfo,"Container");

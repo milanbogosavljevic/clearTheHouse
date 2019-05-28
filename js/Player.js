@@ -39,7 +39,7 @@ this.system = this.system || {};
     p.bulletPoint = null;
 
     p._init = function () {
-        this._START_DAMAGE = 100;
+        this._START_DAMAGE = 10;
         this._START_HEALTH = 100;
         this._START_SPEED = 6;
 
