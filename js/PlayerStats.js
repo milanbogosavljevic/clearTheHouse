@@ -13,6 +13,7 @@ this.system = this.system || {};
     p._damage = null;
     p._health = null;
     p._speed = null;
+    p._cooldown = null;
     p._score = null;
     p._scoreNum = null;
 
@@ -33,12 +34,15 @@ this.system = this.system || {};
         const speed = this._speed = system.CustomMethods.makeText(values.speed, '30px Teko', '#000000', 'center', 'middle');
         speed.y = 175;
 
-        const score = this._score = system.CustomMethods.makeText(this._scoreNum, '40px Teko', '#0006ff', 'center', 'middle');
-        score.x = back.image.width/2;
-        score.y = 250;
+        const cooldown = this._cooldown = system.CustomMethods.makeText(values.cooldown, '30px Teko', '#000000', 'center', 'middle');
+        cooldown.y = 245;
 
-        damage.x = health.x = speed.x = xPos;
-        this.addChild(damage, health, speed, score);
+        const score = this._score = system.CustomMethods.makeText(this._scoreNum, '40px Teko', '#46af57', 'center', 'middle');
+        score.x = back.image.width/2;
+        score.y = 320;
+
+        damage.x = health.x = speed.x = cooldown.x = xPos;
+        this.addChild(damage, health, speed, cooldown, score);
     };
 
     p.updateTextField = function(type, value) {
@@ -51,6 +55,7 @@ this.system = this.system || {};
         this._damage.text = values.damage;
         this._health.text = values.health;
         this._speed.text = values.speed;
+        this._cooldown.text = values.cooldown;
         this._score.text = 0;
     };
 

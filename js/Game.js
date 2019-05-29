@@ -99,7 +99,8 @@ this.system = this.system || {};
         const startingStatsValues = {
             'damage':this._player.getDamage(),
             'health':this._player.getHealth(),
-            'speed':this._player.getSpeed()
+            'speed':this._player.getSpeed(),
+            'cooldown':this._player.getCooldown()
         };
         const playerStatsPanel = this._playerStatsPanel = new system.PlayerStats(startingStatsValues);
         playerStatsPanel.x = 10;
@@ -498,7 +499,8 @@ this.system = this.system || {};
         const playerInfo = {
             'damage':this._player.getDamage(),
             'health':this._player.getHealth(),
-            'speed':this._player.getSpeed()
+            'speed':this._player.getSpeed(),
+            'cooldown':this._player.getCooldown()
         };
         this._playerStatsPanel.resetStats(playerInfo);
         this._enemiesController.clearEnemies();

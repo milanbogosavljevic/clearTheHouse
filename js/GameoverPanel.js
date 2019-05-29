@@ -23,23 +23,23 @@ this.system = this.system || {};
 
         const centerX = back.image.width/2;
 
-        const heading = system.CustomMethods.makeText('GAME OVER', '30px Teko', '#ffffff', 'center', 'middle');
+        const heading = system.CustomMethods.makeText('GAME OVER', '40px Teko', '#ffffff', 'center', 'middle');
         heading.x = centerX;
         heading.y = 35;
 
-        const highscoreHeading = system.CustomMethods.makeText('Highscore', '30px Teko', '#ffffff', 'center', 'middle');
-        highscoreHeading.x = 100;
-        highscoreHeading.y = 80;
+        const highscoreHeading = system.CustomMethods.makeText('Highscore', '40px Teko', '#ffffff', 'center', 'middle');
+        highscoreHeading.x = centerX - 150;
+        highscoreHeading.y = 90;
 
-        const highscore = this._highscore = system.CustomMethods.makeText(playerHighscore, '30px Teko', '#ffff36', 'center', 'middle');
+        const highscore = this._highscore = system.CustomMethods.makeText(playerHighscore, '40px Teko', '#ffff36', 'center', 'middle');
         highscore.x = highscoreHeading.x;
         highscore.y = highscoreHeading.y + 50;
 
-        const currentScore = system.CustomMethods.makeText('Score', '30px Teko', '#ffffff', 'center', 'middle');
-        currentScore.x = 300;
+        const currentScore = system.CustomMethods.makeText('Score', '40px Teko', '#ffffff', 'center', 'middle');
+        currentScore.x = centerX + 150;
         currentScore.y = highscoreHeading.y;
 
-        const score = this._score = system.CustomMethods.makeText('0', '30px Teko', '#ffff36', 'center', 'middle');
+        const score = this._score = system.CustomMethods.makeText('0', '40px Teko', '#ffff36', 'center', 'middle');
         score.x = currentScore.x;
         score.y = highscore.y;
 

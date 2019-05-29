@@ -13,9 +13,17 @@ this.system = this.system || {};
     p._START_SPEED = null;
     p._START_DAMAGE = null;
     p._START_HEALTH = null;
+    p._START_COOLDOWN = null;
+
     p._DAMAGE_UPGRADES = null;
     p._HEALTH_UPGRADES = null;
     p._SPEED_UPGRADES = null;
+    p._COOLDOWN_UPGRADES = null;
+
+    p._damageUpgrades = null;
+    p._healthUpgrades = null;
+    p._speedUpgrades = null;
+    p._cooldownUpgrades = null;
 
     p._speed = null;
     p._width = null;
@@ -28,11 +36,7 @@ this.system = this.system || {};
     p._health = null;
     p._healthShape = null;
     p._healthColor = null;
-    p._gunCooldown = null;
-
-    p._damageUpgrades = null;
-    p._healthUpgrades = null;
-    p._speedUpgrades = null;
+    p._cooldown = null;
 
     p._highscore = null;
 
@@ -42,12 +46,14 @@ this.system = this.system || {};
         this._START_DAMAGE = 10;
         this._START_HEALTH = 100;
         this._START_SPEED = 6;
+        this._START_COOLDOWN = 300;
 
         this._DAMAGE_UPGRADES = [5, 8, 10, 13, 16];
         this._HEALTH_UPGRADES = [15, 20, 30, 40, 50];
         this._SPEED_UPGRADES = [1, 1, 2, 2, 3];
+        this._COOLDOWN_UPGRADES = [50, 50, 50, 50, 50];
 
-        this._gunCooldown = 200;
+        this._cooldown = this._START_COOLDOWN;
 
         const highscore = this._highscore = JSON.parse(localStorage.getItem("highscore"));
         if(highscore === null){
@@ -101,15 +107,18 @@ this.system = this.system || {};
         this._speed = this._START_SPEED;
         this._health = this._START_HEALTH;
         this.mouseChildren = false;// todo staviti na svaki gfx mouse enabled false
+
         this._damageUpgrades = this._DAMAGE_UPGRADES.concat();
         this._healthUpgrades = this._HEALTH_UPGRADES.concat();
         this._speedUpgrades = this._SPEED_UPGRADES.concat();
+        this._cooldownUpgrades = this._COOLDOWN_UPGRADES.concat();
     };
 
     p.resetPlayer = function() {
         this._damage = this._START_DAMAGE;
         this._health = this._START_HEALTH;
         this._speed = this._START_SPEED;
+        this._cooldown = this._START_COOLDOWN;
         this._updateHealthBar();
     };
 
@@ -154,9 +163,17 @@ this.system = this.system || {};
         return this._damage;
     };
 
+    p.increasecooldown = function() {
+        this._cooldown -= this._cooldownUpgrades.shift();
+    };
+
+    p.getCooldown = function() {
+        return this._cooldown;
+    };
+
     p.doShootAnimation = function() {
         this._canShoot = false;
-        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn).wait(this._gunCooldown).call(()=>{
+        createjs.Tween.get(this._gunImage).to({y:15},100,createjs.Ease.circOut).to({y:0},100,createjs.Ease.circIn).wait(this._cooldown).call(()=>{
             this._canShoot = true;
         })
     };
@@ -197,7 +214,8 @@ this.system = this.system || {};
         return {
             'damage':this._damageUpgrades[0],
             'health':this._healthUpgrades[0],
-            'speed':this._speedUpgrades[0]
+            'speed':this._speedUpgrades[0],
+            'cooldown':this._cooldownUpgrades[0]
         }
     };
 
@@ -205,6 +223,7 @@ this.system = this.system || {};
         this._damageUpgrades = this._DAMAGE_UPGRADES.concat();
         this._healthUpgrades = this._HEALTH_UPGRADES.concat();
         this._speedUpgrades = this._SPEED_UPGRADES.concat();
+        this._cooldownUpgrades = this._COOLDOWN_UPGRADES.concat();
     };
 
     p.setHighscore = function(score) {

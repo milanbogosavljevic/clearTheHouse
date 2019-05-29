@@ -24,7 +24,7 @@ this.system = this.system || {};
         const spacing2 = 36;
 
         const currentWave = system.CustomMethods.makeText('Wave', '30px Teko', '#fff', 'center', 'middle');
-        currentWave.y = -165;
+        currentWave.y = -215;
         const waveNumber = this._waveNumber = system.CustomMethods.makeText('0', '30px Teko', '#ffff36', 'center', 'middle');
         waveNumber.y = currentWave.y + spacing2;
 

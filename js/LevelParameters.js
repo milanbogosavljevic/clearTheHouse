@@ -9,8 +9,8 @@ this.system = this.system || {};
         'level1':{
             'enemiesDamage':5,
             'enemiesHealth':100,
-            'maxNumberOfActiveEnemies':3,
-            'maxNumberOfEnemies':6,
+            'maxNumberOfActiveEnemies':5,
+            'maxNumberOfEnemies':3,
             'color':'#ffffff',
             'movementSpeed':2
         },

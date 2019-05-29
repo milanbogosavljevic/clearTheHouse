@@ -15,6 +15,7 @@ this.system = this.system || {};
     p._damageIncrementerTxt = null;
     p._healthIncrementerTxt = null;
     p._speedIncrementerTxt = null;
+    p._cooldownIncrementerTxt = null;
 
     p._init = function (game, startingUpgradeValues) {
         this._game = game;
@@ -67,19 +68,35 @@ this.system = this.system || {};
         speedIncrementer.x = speedButton.x;
         speedIncrementer.y = textsYPos;
 
-        this.addChild(damageButton, damageIncrementer, healthButton, healthIncrementer, speedButton, speedIncrementer);
-        this._buttons.push(damageButton, healthButton, speedButton);
+        buttonImage = system.CustomMethods.makeImage('cooldownButton', true, false);
+        const cooldownButton = new system.Button(buttonImage);
+        cooldownButton.x = 466;
+        cooldownButton.y = buttonsYPos;
+        cooldownButton.on('click', ()=>{
+            cooldownButton.doScaleAnimation();
+            this._game.onUpgradeSelected('cooldown');
+        });
+        let cooldownIncrementer = this._cooldownIncrementerTxt = system.CustomMethods.makeText(`-${startingUpgradeValues.cooldown}`, '36px Teko', '#ffffff', 'center', 'middle');
+        cooldownIncrementer.x = cooldownButton.x;
+        cooldownIncrementer.y = textsYPos;
+
+        console.log(`cooldown ======== ${startingUpgradeValues.cooldown}`);
+
+        this.addChild(damageButton, damageIncrementer, healthButton, healthIncrementer, speedButton, speedIncrementer, cooldownButton, cooldownIncrementer);
+        this._buttons.push(damageButton, healthButton, speedButton, cooldownButton);
     };
 
     p.updateTextField = function(type, value) {
         const txtField = `_${type}IncrementerTxt`;
-        this[txtField].text = `+${value}`;
+        let sign = type === 'cooldown' ? '-' : '+';
+        this[txtField].text = `${sign}${value}`;
     };
 
     p.resetPanel = function(values) {
         this._damageIncrementerTxt.text = `+${values.damage}`;
         this._healthIncrementerTxt.text = `+${values.health}`;
         this._speedIncrementerTxt.text = `+${values.speed}`;
+        this._cooldownIncrementerTxt.text = `-${values.cooldown}`;
     };
 
     p.enableButtons = function(enable) {
