@@ -64,7 +64,14 @@ this.system = this.system || {};
         waveInfo.y = this._CAMERA_HEIGHT/2;
         waveInfo.scaleX = waveInfo.scaleY = 0;
 
-        this._setLevelParameters();
+        let info = system.CustomMethods.makeImage('info', true, false);
+        info.addEventListener('click', (e)=>{
+            // todo start sound
+            info.removeAllEventListeners();
+            this.removeChild(info);
+            info = null;
+            this._setLevelParameters();
+        });
 
         this._level = new createjs.Container();
 
@@ -113,6 +120,8 @@ this.system = this.system || {};
         gameoverPanel.y = -300;
         gameoverPanel.visible = false;
         this.addChild(gameoverPanel);
+
+        this.addChild(info);
 
         // SETTING CONSTANTS
 
