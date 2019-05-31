@@ -48,10 +48,10 @@ this.system = this.system || {};
         this._START_SPEED = 6;
         this._START_COOLDOWN = 300;
 
-        this._DAMAGE_UPGRADES = [5, 8, 10, 13, 16];
-        this._HEALTH_UPGRADES = [15, 20, 30, 40, 50];
-        this._SPEED_UPGRADES = [1, 1, 2, 2, 3];
-        this._COOLDOWN_UPGRADES = [50, 50, 50, 50, 50];
+        this._DAMAGE_UPGRADES = [5, 8, 10, 10, 10, 12];
+        this._HEALTH_UPGRADES = [20, 20, 30, 40, 50, 60];
+        this._SPEED_UPGRADES = [1, 1, 2, 2, 3, 3];
+        this._COOLDOWN_UPGRADES = [50, 50, 50, 50, 50, 50];
 
         this._cooldown = this._START_COOLDOWN;
 

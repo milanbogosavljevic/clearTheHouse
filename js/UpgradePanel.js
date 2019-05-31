@@ -80,8 +80,6 @@ this.system = this.system || {};
         cooldownIncrementer.x = cooldownButton.x;
         cooldownIncrementer.y = textsYPos;
 
-        console.log(`cooldown ======== ${startingUpgradeValues.cooldown}`);
-
         this.addChild(damageButton, damageIncrementer, healthButton, healthIncrementer, speedButton, speedIncrementer, cooldownButton, cooldownIncrementer);
         this._buttons.push(damageButton, healthButton, speedButton, cooldownButton);
     };

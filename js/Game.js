@@ -98,7 +98,7 @@ this.system = this.system || {};
 
         const startingUpgradeValues = this._player.getStartingUpgradeValues();
         const upgradePanel = this._upgradePanel = new system.UpgradePanel(this, startingUpgradeValues);
-        upgradePanel.x = 760;
+        upgradePanel.x = 695;
         upgradePanel.y = -300;
         upgradePanel.visible = false;
         this.addChild(upgradePanel);
@@ -116,7 +116,7 @@ this.system = this.system || {};
 
         const highscore = this._player.getHighscore();
         const gameoverPanel = this._gameoverPanel = new system.GameoverPanel(this, highscore);
-        gameoverPanel.x = 760;
+        gameoverPanel.x = 695;
         gameoverPanel.y = -300;
         gameoverPanel.visible = false;
         this.addChild(gameoverPanel);
