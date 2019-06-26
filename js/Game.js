@@ -20,6 +20,7 @@ this.system = this.system || {};
 
     p._level = null;
     p._currentLevel = null;
+    p._numberOfLevels = null;
     p._fpsText = null;
     p._waveInfo = null;
     p._upgradePanel = null;
@@ -27,6 +28,7 @@ this.system = this.system || {};
     p._gameoverPanel = null;
     p._cursor = null;
     p._playerCountiniouslyShooting = null;
+    p._gameBeatenInterval = null;
 
     p._gameOver = true;
 
@@ -58,6 +60,7 @@ this.system = this.system || {};
         this._playerBullets = [];
 
         this._currentLevel = 1;
+        this._numberOfLevels = system.LevelParameters.getNumberOfLevels();
 
         const waveInfo = this._waveInfo = new system.WaveInfo();
         waveInfo.x = this._CAMERA_WIDTH/2;
@@ -521,6 +524,20 @@ this.system = this.system || {};
         this._upgradePanel.resetPanel(startingUpgradeValues);
     };
 
+    p._showCongratulationsAnimation = function(show) {
+        if(show === true){
+            this._gameBeatenInterval = setInterval(()=>{
+                const xPos = system.CustomMethods.getRandomNumberFromTo(Math.abs(this._level.x), (this._CAMERA_WIDTH + Math.abs(this._level.x)));
+                const yPos = system.CustomMethods.getRandomNumberFromTo(Math.abs(this._level.y), (this._CAMERA_HEIGHT + Math.abs(this._level.y)));
+                const color = system.LevelParameters.getRandomColor();
+                this.showParticles(xPos, yPos, color, 80, 10, -400, 400);// todo pozicije promeniti
+            },1500);
+        }else {
+            clearInterval(this._gameBeatenInterval);
+            this._gameBeatenInterval = null;
+        }
+    };
+
     p.onUpgradeSelected = function(upgrade) {
         const method = `increase${upgrade}`;
         this._player[method]();
@@ -552,7 +569,12 @@ this.system = this.system || {};
     p.levelPassed = function() {
         this._gameOver = true;
         this._currentLevel++;
-        this._showUpgradePanel(true);
+        if(this._currentLevel > this._numberOfLevels){
+            this._showGameoverPanel(true);
+            this._showCongratulationsAnimation(true);
+        }else {
+            this._showUpgradePanel(true);
+        }
     };
 
     p.enemyHitsPlayer = function(damage) {
@@ -578,6 +600,9 @@ this.system = this.system || {};
 
     p.onReset = function() {
         this._showGameoverPanel(false);
+        if(this._gameBeatenInterval !== null){
+            this._showCongratulationsAnimation(false);
+        }
     };
 
     p.render = function(e){
@@ -591,6 +616,7 @@ this.system = this.system || {};
         }
         //this._updateFps();
         stage.update(e);
+        //console.log(this._level.x);
         //console.log(this._enemyBullets.length);
         //console.log(this._playerBullets.length);
         //console.log(this._playerAmmo.length);

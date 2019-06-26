@@ -128,9 +128,20 @@ this.system = this.system || {};
         }
     };
 
+    LevelParameters.getRandomColor = function() {
+        const maxNum = LevelParameters.getNumberOfLevels();
+        const randomNum = system.CustomMethods.getRandomNumberFromTo(1, maxNum);
+        const randomLevel = `level${randomNum}`;
+        return LevelParameters.parameters[randomLevel].color;
+    };
+
     LevelParameters.getParametersForLevel = function(level) {
         const levelToReturn = `level${level}`;
         return LevelParameters.parameters[levelToReturn];
+    };
+
+    LevelParameters.getNumberOfLevels = function() {
+        return Object.keys(LevelParameters.parameters).length;
     };
 
     system.LevelParameters = LevelParameters;
