@@ -69,11 +69,11 @@ this.system = this.system || {};
 
         let info = system.CustomMethods.makeImage('info', true, false);
         info.addEventListener('click', (e)=>{
-            // todo start sound
             info.removeAllEventListeners();
             this.removeChild(info);
             info = null;
             this._setLevelParameters();
+            system.SoundManager.play('backgroundMusic', 0.5, -1);
         });
 
         this._level = new createjs.Container();
@@ -194,6 +194,13 @@ this.system = this.system || {};
             this._showUpgradePanel(true);
         },1000);*/
 
+        this._registerSounds();
+    };
+
+    p._registerSounds = function() {
+        system.SoundManager.registerSound('backgroundMusic');
+        system.SoundManager.registerSound('shootSound');
+        system.SoundManager.registerSound('enemyShootSound');
     };
 
     p._playerShooting = function() {
@@ -293,6 +300,7 @@ this.system = this.system || {};
     };
 
     p._playerShoot = function() {
+        system.SoundManager.play('shootSound');
         const playerDimension = this._player.getDimension();
 
         let point = this._player.localToGlobal(this.x, this.y);

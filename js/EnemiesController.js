@@ -203,6 +203,7 @@ this.system = this.system || {};
             const enemy = this._activeEnemies[i];
             const enemyDimension = enemy.getDimension();
             if(enemy.canShoot() === true){
+                system.SoundManager.play('enemyShootSound');
                 if(this._enemyAmmo.length > 0){
                     bullet = this._enemyAmmo[0];
                     this._enemyAmmo.splice(0,1);
