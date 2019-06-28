@@ -201,6 +201,10 @@ this.system = this.system || {};
         system.SoundManager.registerSound('backgroundMusic');
         system.SoundManager.registerSound('shootSound');
         system.SoundManager.registerSound('enemyShootSound');
+        system.SoundManager.registerSound('gameOverSound');
+        system.SoundManager.registerSound('upgradeSelectSound');
+        system.SoundManager.registerSound('enemyExplosionSound');
+        system.SoundManager.registerSound('playerExplosionSound');
     };
 
     p._playerShooting = function() {
@@ -235,6 +239,7 @@ this.system = this.system || {};
                 this._gameoverPanel.visible = false;
             }else{
                 this._gameoverPanel.enableButtons(true);
+                system.SoundManager.play('gameOverSound');
             }
         });
     };
@@ -547,6 +552,7 @@ this.system = this.system || {};
     };
 
     p.onUpgradeSelected = function(upgrade) {
+        system.SoundManager.play('upgradeSelectSound');
         const method = `increase${upgrade}`;
         this._player[method]();
         this._showUpgradePanel(false, upgrade);
@@ -598,6 +604,7 @@ this.system = this.system || {};
             const color = this._player.getHealthColor();
             this.showParticles(xPos, yPos, color, 80, 10, -400, 400);
             this._showGameoverPanel(true);
+            system.SoundManager.play('playerExplosionSound');
             console.log('game over');
         }
     };

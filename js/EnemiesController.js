@@ -185,6 +185,7 @@ this.system = this.system || {};
                         const enemyY = enemy.y + (dimension.height/2);
                         const color = this._getHealthColor();
                         this._game.showParticles(enemyX, enemyY, color, 40, 10, -200, 200);
+                        system.SoundManager.play('enemyExplosionSound', 2);
                     }
                     return true;
                 }
