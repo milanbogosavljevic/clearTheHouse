@@ -50,6 +50,7 @@ this.system = this.system || {};
         resetButton.y = 230;
         resetButton.on('click', ()=>{
             resetButton.doScaleAnimation();
+            system.SoundManager.play('upgradeSelectSound');
             this._game.onReset();
         });
 
