@@ -207,7 +207,11 @@ this.system = this.system || {};
 
     p.getUpgradeValue = function(upgrade) {
         const upgradeType = `_${upgrade}Upgrades`;
-        return this[upgradeType][0];
+        if(this[upgradeType].length === 0){
+            return false;
+        }else {
+            return this[upgradeType][0];
+        }
     };
 
     p.getStartingUpgradeValues = function() {

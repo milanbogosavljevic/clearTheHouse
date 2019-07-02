@@ -34,6 +34,7 @@ this.system = this.system || {};
 
         let buttonImage = system.CustomMethods.makeImage('damageButton', true, false);
         const damageButton = new system.Button(buttonImage);
+        damageButton.setId('damage');
         damageButton.x = 67;
         damageButton.y = buttonsYPos;
         damageButton.on('click', ()=>{
@@ -46,6 +47,7 @@ this.system = this.system || {};
 
         buttonImage = system.CustomMethods.makeImage('healthButton', true, false);
         const healthButton = new system.Button(buttonImage);
+        healthButton.setId('health');
         healthButton.x = 200;
         healthButton.y = buttonsYPos;
         healthButton.on('click', ()=>{
@@ -58,6 +60,7 @@ this.system = this.system || {};
 
         buttonImage = system.CustomMethods.makeImage('speedButton', true, false);
         const speedButton = new system.Button(buttonImage);
+        speedButton.setId('speed');
         speedButton.x = 333;
         speedButton.y = buttonsYPos;
         speedButton.on('click', ()=>{
@@ -70,6 +73,7 @@ this.system = this.system || {};
 
         buttonImage = system.CustomMethods.makeImage('cooldownButton', true, false);
         const cooldownButton = new system.Button(buttonImage);
+        cooldownButton.setId('cooldown');
         cooldownButton.x = 466;
         cooldownButton.y = buttonsYPos;
         cooldownButton.on('click', ()=>{
@@ -95,12 +99,25 @@ this.system = this.system || {};
         this._healthIncrementerTxt.text = `+${values.health}`;
         this._speedIncrementerTxt.text = `+${values.speed}`;
         this._cooldownIncrementerTxt.text = `-${values.cooldown}`;
+        for(let i = 0; i < this._buttons.length; i++){
+            this._buttons[i].visible = true;
+        }
     };
 
     p.enableButtons = function(enable) {
         this._buttons.forEach((button)=>{
             button.enableClick(enable);
         })
+    };
+
+    p.hideButton = function(upgrade) {
+        for(let i = 0; i < this._buttons.length; i++){
+            if(this._buttons[i].buttonId === upgrade){
+                this._buttons[i].visible = false;
+                const txtField = `_${upgrade}IncrementerTxt`;
+                this[txtField].text = '';
+            }
+        }
     };
 
     system.UpgradePanel = createjs.promote(UpgradePanel,"Container");

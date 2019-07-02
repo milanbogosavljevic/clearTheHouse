@@ -259,7 +259,11 @@ this.system = this.system || {};
                 this._setLevelParameters();
                 this._upgradePanel.visible = false;
                 const nextUpgradeValue = this._player.getUpgradeValue(upgradeSelected);
-                this._upgradePanel.updateTextField(upgradeSelected, nextUpgradeValue);
+                if(nextUpgradeValue === false){
+                    this._upgradePanel.hideButton(upgradeSelected);
+                }else {
+                    this._upgradePanel.updateTextField(upgradeSelected, nextUpgradeValue);
+                }
             }
         });
     };
@@ -302,6 +306,16 @@ this.system = this.system || {};
         fsButton.x = 1885;
         fsButton.y = 35;
         this.addChild(fsButton);
+
+        const soundButtonImage = system.CustomMethods.makeImage('soundButton', true, false);
+        let soundButton = new system.Button(soundButtonImage);
+        soundButton.addEventListener('click', (e)=>{
+            system.SoundManager.muteAllSounds();
+            soundButton.alpha = createjs.Sound.muted === true ? 0.5 : 1;
+        });
+        soundButton.x = 1820;
+        soundButton.y = 35;
+        this.addChild(soundButton);
     };
 
     p._playerShoot = function() {

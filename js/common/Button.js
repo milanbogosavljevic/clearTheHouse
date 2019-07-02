@@ -20,6 +20,10 @@ this.system = this.system || {};
         this.addChild(this._body);
     };
 
+    p.setId = function(id) {
+        this.buttonId = id;
+    };
+
     p.addText = function(text) {
         this._text = text;
         this.addChild(this._text);
