@@ -49,7 +49,7 @@ this.system = this.system || {};
         this._START_COOLDOWN = 300;
 
         this._DAMAGE_UPGRADES = [5, 8, 10, 10, 10, 12];
-        this._HEALTH_UPGRADES = [30, 40, 50, 50, 60, 60];
+        this._HEALTH_UPGRADES = [40, 40, 50, 50, 60, 60];
         this._SPEED_UPGRADES = [1, 1, 2, 2, 3, 3];
         this._COOLDOWN_UPGRADES = [50, 50, 50, 50, 50, 50];
 
