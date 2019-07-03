@@ -205,6 +205,8 @@ this.system = this.system || {};
         system.SoundManager.registerSound('upgradeSelectSound');
         system.SoundManager.registerSound('enemyExplosionSound');
         system.SoundManager.registerSound('playerExplosionSound');
+        system.SoundManager.registerSound('enemyHitSound');
+        system.SoundManager.registerSound('playerHitSound');
     };
 
     p._playerShooting = function() {
@@ -514,6 +516,7 @@ this.system = this.system || {};
             }else{
                 const bulletDamage = this._player.getDamage();
                 if(this._enemiesController.checkHitFromPlayer(bullet, bulletDamage) === true){
+                    system.SoundManager.play('enemyHitSound', 0.3);
                     this._playerAmmo.push(bullet);
                     this._playerBullets.splice(i,1);
                     bullet.visible = false;
@@ -557,7 +560,7 @@ this.system = this.system || {};
                 const xPos = system.CustomMethods.getRandomNumberFromTo(Math.abs(this._level.x), (this._CAMERA_WIDTH + Math.abs(this._level.x)));
                 const yPos = system.CustomMethods.getRandomNumberFromTo(Math.abs(this._level.y), (this._CAMERA_HEIGHT + Math.abs(this._level.y)));
                 const color = system.LevelParameters.getRandomColor();
-                this.showParticles(xPos, yPos, color, 80, 10, -400, 400);// todo pozicije promeniti
+                this.showParticles(xPos, yPos, color, 80, 10, -400, 400);
             },1500);
         }else {
             clearInterval(this._gameBeatenInterval);
@@ -609,6 +612,7 @@ this.system = this.system || {};
         this._player.decreaseHealth(damage);
         this._playerStatsPanel.updateTextField('health', this._player.getHealth());
         this._shakeStage();
+        system.SoundManager.play('playerHitSound');
         if(this._player.getHealth() < 1) {
             this._player.visible = false;
             this._gameOver = true;
